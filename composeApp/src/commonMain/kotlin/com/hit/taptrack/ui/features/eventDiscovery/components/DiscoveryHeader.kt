@@ -22,7 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.ConfirmationNumber
 
 @Composable
-fun DiscoveryHeader(onTicketsClick: () -> Unit) {
+fun DiscoveryHeader(
+    onTicketsClick: () -> Unit,
+    onProfileClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -66,7 +69,7 @@ fun DiscoveryHeader(onTicketsClick: () -> Unit) {
 
             // Ikon Profil (Placeholder untuk navigasi ke Profile/Settings)
             IconButton(
-                onClick = { /* TODO: Navigasi ke Profil */ },
+                onClick = onProfileClick,
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
