@@ -38,7 +38,7 @@ fun TapTrackTheme(
     val colorScheme = if (darkTheme) DarkColors else LightColors
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = LightColors, // Replace with colorScheme on Prod later
         typography = AppTypography,
         // shapes = AppShapes // (Opsional) Jika nanti ingin mengatur radius border tombol secara global
         content = content

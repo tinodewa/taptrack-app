@@ -3,6 +3,7 @@ package com.hit.taptrack.ui.features.auth.login
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +18,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.auth.login.states.LoginEvent
+import com.hit.taptrack.ui.features.eventDiscovery.EventDiscoveryScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 
 class LoginScreen : Screen {
@@ -36,7 +38,7 @@ class LoginScreen : Screen {
             if (uiState.isLoginSuccess) {
                 navigator.pop()
                 // TODO: Arahkan user berdasarkan peran (Role) yang didapat
-                // navigator.replace(EventDiscoveryScreen())
+                 navigator.replace(EventDiscoveryScreen())
             }
         }
 
@@ -49,7 +51,7 @@ class LoginScreen : Screen {
         }
 
         RmsScaffold(
-            backgroundColor = Color.White,
+            backgroundColor = MaterialTheme.colorScheme.surface,
         ) { innerPadding ->
             BoxWithConstraints(
                 modifier = Modifier
