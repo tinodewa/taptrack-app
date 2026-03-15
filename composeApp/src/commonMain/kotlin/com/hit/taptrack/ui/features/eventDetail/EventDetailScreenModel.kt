@@ -37,7 +37,7 @@ class EventDetailScreenModel(private val eventId: String) : ScreenModel {
                 location = "Sirkuit Internasional Batu, Malang, Jawa Timur",
                 rules = "Wajib menggunakan perlengkapan keselamatan standar FIM. Toleransi keterlambatan scrutineering maksimal 30 menit.",
                 categories = listOf("Bebek Modif 4T 130cc", "Sport Trail 250cc Open", "FFA (Free For All)"),
-                status = EventStatus.UPCOMING,
+                status = EventStatus.COMPLETED,
                 registeredRacers = 120,
                 maxCapacity = 200
             )

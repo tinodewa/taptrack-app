@@ -36,6 +36,7 @@ import com.hit.taptrack.data.model.EventDetailModel
 import com.hit.taptrack.ui.features.eventDetail.components.CategoryChip
 import com.hit.taptrack.ui.features.eventDetail.components.DynamicActionButton
 import com.hit.taptrack.ui.features.eventDetail.components.InfoRow
+import com.hit.taptrack.ui.features.eventDetail.components.LeaderboardAccessCard
 import com.hit.taptrack.ui.features.eventDetail.states.EventDetailEvent
 import com.hit.taptrack.ui.features.eventDetail.states.EventDetailUiState
 import com.hit.taptrack.ui.features.eventDiscovery.components.StatusBadge
@@ -46,8 +47,9 @@ fun EventDetailCompact(
     detail: EventDetailModel,
     uiState: EventDetailUiState,
     onEvent: (EventDetailEvent) -> Unit,
+    onNavigateToTickets: () -> Unit,
+    onNavigateToLeaderboard: () -> Unit,
     onBackClick: () -> Unit,
-    onNavigateToTickets: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -86,6 +88,9 @@ fun EventDetailCompact(
                 InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoRow(icon = Icons.Default.Group, text = "${detail.registeredRacers} / ${detail.maxCapacity} Peserta Terdaftar")
+
+                // SISIPKAN KARTU LEADERBOARD DI SINI (Tepat di bawah info utama)
+                LeaderboardAccessCard(status = detail.status, onClick = onNavigateToLeaderboard)
 
                 Spacer(modifier = Modifier.height(24.dp))
                 Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
@@ -130,8 +135,9 @@ fun EventDetailExpanded(
     detail: EventDetailModel,
     uiState: EventDetailUiState,
     onEvent: (EventDetailEvent) -> Unit,
+    onNavigateToTickets: () -> Unit,
+    onNavigateToLeaderboard: () -> Unit,
     onBackClick: () -> Unit,
-    onNavigateToTickets: () -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         // Kiri: Hero & Info Utama
@@ -157,6 +163,9 @@ fun EventDetailExpanded(
                     InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
                     Spacer(modifier = Modifier.height(12.dp))
                     InfoRow(icon = Icons.Default.Group, text = "${detail.registeredRacers} / ${detail.maxCapacity} Terdaftar")
+
+                    // SISIPKAN KARTU LEADERBOARD DI SINI (Tepat di bawah info utama)
+                    LeaderboardAccessCard(status = detail.status, onClick = onNavigateToLeaderboard)
 
                     Spacer(modifier = Modifier.height(32.dp))
                     Text(text = "Deskripsi", style = MaterialTheme.typography.titleLarge)
