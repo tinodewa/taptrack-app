@@ -5,8 +5,10 @@ import com.hit.taptrack.ui.features.auth.register.RegisterScreenModel
 import com.hit.taptrack.ui.features.eventDetail.EventDetailScreenModel
 import com.hit.taptrack.ui.features.eventDiscovery.EventDiscoveryScreenModel
 import com.hit.taptrack.ui.features.leaderboard.LeaderboardScreenModel
+import com.hit.taptrack.ui.features.manageEvent.ManageEventScreenModel
 import com.hit.taptrack.ui.features.myTicket.MyTicketsScreenModel
 import com.hit.taptrack.ui.features.profile.ProfileScreenModel
+import com.hit.taptrack.ui.features.scan.ScanScreenModel
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -34,6 +36,8 @@ val commonModule = module {
     factoryOf(::MyTicketsScreenModel)
     factoryOf(::LeaderboardScreenModel)
     factoryOf(::ProfileScreenModel)
+    factoryOf(::ScanScreenModel)
+    factoryOf(::ManageEventScreenModel)
 }
 
 // 3. Definisi Expect: "Saya harap ada variabel bernama platformModule di setiap platform"

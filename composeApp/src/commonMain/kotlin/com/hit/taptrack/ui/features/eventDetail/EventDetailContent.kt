@@ -49,6 +49,7 @@ fun EventDetailCompact(
     onEvent: (EventDetailEvent) -> Unit,
     onNavigateToTickets: () -> Unit,
     onNavigateToLeaderboard: () -> Unit,
+    onNavigateToManageEvent: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -123,7 +124,7 @@ fun EventDetailCompact(
             shadowElevation = 8.dp
         ) {
             Box(modifier = Modifier.padding(16.dp)) {
-                DynamicActionButton(uiState, onEvent, onNavigateToTickets)
+                DynamicActionButton(uiState, onEvent, onNavigateToTickets, onNavigateToManageEvent)
             }
         }
     }
@@ -137,6 +138,7 @@ fun EventDetailExpanded(
     onEvent: (EventDetailEvent) -> Unit,
     onNavigateToTickets: () -> Unit,
     onNavigateToLeaderboard: () -> Unit,
+    onNavigateToManageEvent: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     Row(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -194,7 +196,7 @@ fun EventDetailExpanded(
 
                 Spacer(modifier = Modifier.weight(1f)) // Dorong tombol ke paling bawah
 
-                DynamicActionButton(uiState, onEvent, onNavigateToTickets)
+                DynamicActionButton(uiState, onEvent, onNavigateToTickets, onNavigateToManageEvent)
             }
         }
     }

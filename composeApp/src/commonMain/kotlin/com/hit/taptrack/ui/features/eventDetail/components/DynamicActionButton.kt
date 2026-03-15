@@ -23,7 +23,8 @@ import com.hit.taptrack.ui.features.eventDetail.states.EventDetailUiState
 fun DynamicActionButton(
     uiState: EventDetailUiState,
     onEvent: (EventDetailEvent) -> Unit,
-    onNavigateToTickets: () -> Unit
+    onNavigateToTickets: () -> Unit,
+    onNavigateToManageEvent: () -> Unit
 ) {
     val isUpcoming = uiState.eventDetail?.status == EventStatus.UPCOMING
 
@@ -56,7 +57,7 @@ fun DynamicActionButton(
         }
         UserRole.COMMITTEE -> {
             Button(
-                onClick = { onEvent(EventDetailEvent.ManageEvent) },
+                onClick = onNavigateToManageEvent,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)

@@ -19,6 +19,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.leaderboard.LeaderboardScreen
+import com.hit.taptrack.ui.features.manageEvent.ManageEventScreen
 import com.hit.taptrack.ui.features.myTicket.MyTicketsScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
@@ -60,7 +61,8 @@ data class EventDetailScreen(val eventId: String) : Screen {
                                 screenModel::onEvent,
                                 onNavigateToTickets = { navigator.push(MyTicketsScreen()) },
                                 onNavigateToLeaderboard = { navigator.push(LeaderboardScreen(detail.id)) },
-                                onBackClick = { navigator.pop() }
+                                onNavigateToManageEvent = { navigator.push(ManageEventScreen(detail.id)) },
+                                onBackClick = { navigator.pop() },
                             )
                         } else {
                             EventDetailExpanded(
@@ -69,6 +71,7 @@ data class EventDetailScreen(val eventId: String) : Screen {
                                 screenModel::onEvent,
                                 onNavigateToTickets = { navigator.push(MyTicketsScreen()) },
                                 onNavigateToLeaderboard = { navigator.push(LeaderboardScreen(detail.id)) },
+                                onNavigateToManageEvent = { navigator.push(ManageEventScreen(detail.id)) },
                                 onBackClick = { navigator.pop() }
                             )
                         }

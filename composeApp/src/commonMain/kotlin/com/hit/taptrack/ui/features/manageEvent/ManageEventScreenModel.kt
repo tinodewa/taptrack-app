@@ -1,0 +1,84 @@
+package com.hit.taptrack.ui.features.manageEvent
+
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.hit.taptrack.common.state.EventStatus
+import com.hit.taptrack.common.state.ParticipantStatus
+import com.hit.taptrack.data.model.ParticipantModel
+import com.hit.taptrack.ui.features.manageEvent.states.ManageEventEvent
+import com.hit.taptrack.ui.features.manageEvent.states.ManageEventUiState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class ManageEventScreenModel(private val eventId: String) : ScreenModel {
+
+    private val _uiState = MutableStateFlow(ManageEventUiState(eventId = eventId))
+    val uiState: StateFlow<ManageEventUiState> = _uiState.asStateFlow()
+
+    init {
+        loadEventData()
+    }
+
+    fun onEvent(event: ManageEventEvent) {
+        when (event) {
+            ManageEventEvent.RefreshData -> loadEventData()
+            is ManageEventEvent.ChangeEventStatus -> updateEventStatus(event.newStatus)
+            is ManageEventEvent.OverrideParticipantStatus -> overrideParticipant(
+                event.registrationId,
+                event.newStatus
+            )
+        }
+    }
+
+    private fun loadEventData() {
+        screenModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            delay(1000) // Simulasi GET data event & participants
+
+            val dummyParticipants = listOf(
+                ParticipantModel("REG-001", "Andi Gilang", "99", "FFA", ParticipantStatus.RACING),
+                ParticipantModel("REG-002", "Doni Tata", "27", "FFA", ParticipantStatus.REGISTERED),
+                ParticipantModel(
+                    "REG-003",
+                    "Mario Aji",
+                    "16",
+                    "Bebek 4T",
+                    ParticipantStatus.FINISHED
+                )
+            )
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    eventName = "Kejuaraan Daerah Motocross Jatim",
+                    eventStatus = EventStatus.UPCOMING,
+                    participants = dummyParticipants
+                )
+            }
+        }
+    }
+
+    private fun updateEventStatus(newStatus: EventStatus) {
+        screenModelScope.launch {
+            _uiState.update { it.copy(isStatusChanging = true) }
+            // TODO: API PUT /api/v1/events/:event_id/status
+            delay(1000)
+            _uiState.update { it.copy(isStatusChanging = false, eventStatus = newStatus) }
+        }
+    }
+
+    private fun overrideParticipant(registrationId: String, newStatus: ParticipantStatus) {
+        screenModelScope.launch {
+            // TODO: API PUT /api/v1/registrations/override/:registration_id/status
+            // Untuk simulasi, kita update state lokal secara langsung
+            val updatedList = _uiState.value.participants.map {
+                if (it.registrationId == registrationId) it.copy(status = newStatus) else it
+            }
+            _uiState.update { it.copy(participants = updatedList) }
+        }
+    }
+}
