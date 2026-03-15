@@ -22,6 +22,7 @@ import com.hit.taptrack.ui.features.eventDetail.EventDetailScreen
 import com.hit.taptrack.ui.features.eventDiscovery.components.DiscoveryHeader
 import com.hit.taptrack.ui.features.eventDiscovery.components.DiscoveryTabs
 import com.hit.taptrack.ui.features.eventDiscovery.states.EventDiscoveryEvent
+import com.hit.taptrack.ui.features.myTicket.MyTicketsScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 
 class EventDiscoveryScreen : Screen {
@@ -41,7 +42,9 @@ class EventDiscoveryScreen : Screen {
                     .padding(innerPadding)
             ) {
                 // Header Global (App Bar Custom)
-                DiscoveryHeader()
+                DiscoveryHeader(
+                    { navigator.push(MyTicketsScreen()) }
+                )
 
                 // Tab Navigasi Sesuai SKPL (Mendatang, Berlangsung, Selesai)
                 DiscoveryTabs(

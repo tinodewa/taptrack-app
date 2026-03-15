@@ -1,28 +1,26 @@
 package com.hit.taptrack.ui.features.eventDetail
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.hit.taptrack.ui.features.myTicket.MyTicketsScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
-import org.koin.core.parameter.parametersOf // Penting untuk inject parameter
+import org.koin.core.parameter.parametersOf
 
 // Kita tambahkan parameter eventId di class Screen
 data class EventDetailScreen(val eventId: String) : Screen {
@@ -55,9 +53,21 @@ data class EventDetailScreen(val eventId: String) : Screen {
                 } else {
                     uiState.eventDetail?.let { detail ->
                         if (maxWidth < 800.dp) {
-                            EventDetailCompact(detail, uiState, screenModel::onEvent) { navigator.pop() }
+                            EventDetailCompact(
+                                detail,
+                                uiState,
+                                screenModel::onEvent,
+                                onBackClick = { navigator.pop() },
+                                onNavigateToTickets = { navigator.push(MyTicketsScreen()) }
+                            )
                         } else {
-                            EventDetailExpanded(detail, uiState, screenModel::onEvent) { navigator.pop() }
+                            EventDetailExpanded(
+                                detail,
+                                uiState,
+                                screenModel::onEvent,
+                                onBackClick = { navigator.pop() },
+                                onNavigateToTickets = { navigator.push(MyTicketsScreen()) }
+                            )
                         }
                     }
                 }

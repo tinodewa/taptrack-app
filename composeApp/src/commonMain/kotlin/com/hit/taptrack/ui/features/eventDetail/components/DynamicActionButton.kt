@@ -20,15 +20,24 @@ import com.hit.taptrack.ui.features.eventDetail.states.EventDetailUiState
 
 // Komponen Logika Tombol berdasarkan Role
 @Composable
-fun DynamicActionButton(uiState: EventDetailUiState, onEvent: (EventDetailEvent) -> Unit) {
+fun DynamicActionButton(
+    uiState: EventDetailUiState,
+    onEvent: (EventDetailEvent) -> Unit,
+    onNavigateToTickets: () -> Unit
+) {
     val isUpcoming = uiState.eventDetail?.status == EventStatus.UPCOMING
 
     when (uiState.userRole) {
         UserRole.RACER -> {
             Button(
-                onClick = { onEvent(EventDetailEvent.JoinEvent) },
+                // Logika Klik: Jika sudah sukses daftar, pergi ke tiket. Jika belum, lakukan JoinEvent.
+                onClick = {
+                    if (uiState.isJoinSuccess) onNavigateToTickets()
+                    else onEvent(EventDetailEvent.JoinEvent)
+                },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = !uiState.isJoinLoading && isUpcoming && !uiState.isJoinSuccess,
+                // Tombol aktif jika loading selesai, event upcoming, ATAU jika sudah sukses daftar
+                enabled = !uiState.isJoinLoading && (isUpcoming || uiState.isJoinSuccess),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
@@ -36,7 +45,10 @@ fun DynamicActionButton(uiState: EventDetailUiState, onEvent: (EventDetailEvent)
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                 } else {
                     Text(
-                        text = if (uiState.isJoinSuccess) "TERDAFTAR" else if (isUpcoming) "GABUNG BALAPAN" else "PENDAFTARAN DITUTUP",
+                        // Ubah teks secara dinamis
+                        text = if (uiState.isJoinSuccess) "LIHAT TIKET"
+                        else if (isUpcoming) "GABUNG BALAPAN"
+                        else "PENDAFTARAN DITUTUP",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                     )
                 }

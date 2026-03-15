@@ -48,7 +48,7 @@ class EventDetailScreenModel(private val eventId: String) : ScreenModel {
                 it.copy(
                     isLoading = false,
                     eventDetail = dummyDetail,
-                    userRole = UserRole.COMMITTEE // Ganti dengan userRole yang sesuai: RACER, COMMITTEE, dll.
+                    userRole = UserRole.RACER // Ganti dengan userRole yang sesuai: RACER, COMMITTEE, dll.
                 )
             }
         }

@@ -19,9 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.ConfirmationNumber
 
 @Composable
-fun DiscoveryHeader() {
+fun DiscoveryHeader(onTicketsClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,15 +44,40 @@ fun DiscoveryHeader() {
             )
         }
 
-        // Ikon Profil (Placeholder untuk navigasi ke Profile/Settings)
-        IconButton(
-            onClick = { /* TODO: Navigasi ke Profil */ },
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(Icons.Outlined.Person, contentDescription = "Profil", tint = MaterialTheme.colorScheme.onPrimary)
+
+            // Tombol Navigasi ke Halaman Tiket
+            IconButton(
+                onClick = onTicketsClick, // Panggil lambda di sini
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
+            ) {
+                Icon(
+                    Icons.Default.ConfirmationNumber, // Ikon tiket
+                    contentDescription = "Tiket Saya",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+
+            // Ikon Profil (Placeholder untuk navigasi ke Profile/Settings)
+            IconButton(
+                onClick = { /* TODO: Navigasi ke Profil */ },
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
+            ) {
+                Icon(
+                    Icons.Outlined.Person,
+                    contentDescription = "Profil",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
