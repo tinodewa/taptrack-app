@@ -16,21 +16,31 @@ import com.hit.taptrack.ui.features.eventDiscovery.components.EventCard
 
 // --- TAMPILAN MOBILE (List 1 Kolom) ---
 @Composable
-fun EventDiscoveryCompact(events: List<EventModel>) {
+fun EventDiscoveryCompact(
+    events: List<EventModel>,
+    onEventClick: (EventModel) -> Unit
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(events) { event ->
-            EventCard(event = event, onClick = { /* TODO: Navigasi ke Detail Event */ })
+            EventCard(event = event, onClick = {
+                /* TODO: Navigasi ke Detail Event */
+                onEventClick(event)
+                }
+            )
         }
     }
 }
 
 // --- TAMPILAN DESKTOP (Grid Banyak Kolom) ---
 @Composable
-fun EventDiscoveryExpanded(events: List<EventModel>) {
+fun EventDiscoveryExpanded(
+    events: List<EventModel>,
+    onEventClick: (EventModel) -> Unit
+) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 350.dp),
         modifier = Modifier.fillMaxSize(),
@@ -39,7 +49,11 @@ fun EventDiscoveryExpanded(events: List<EventModel>) {
         horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         items(events) { event ->
-            EventCard(event = event, onClick = { /* TODO: Navigasi ke Detail Event */ })
+            EventCard(event = event, onClick = {
+                /* TODO: Navigasi ke Detail Event */
+                onEventClick(event)
+            }
+            )
         }
     }
 }

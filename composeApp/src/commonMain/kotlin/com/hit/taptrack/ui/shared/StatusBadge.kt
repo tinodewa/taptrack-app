@@ -16,7 +16,10 @@ import com.hit.taptrack.common.state.EventStatus
 
 // Komponen Label Status Dinamis
 @Composable
-fun StatusBadge(status: EventStatus) {
+fun StatusBadge(
+    status: EventStatus,
+    modifier: Modifier = Modifier
+) {
     val (backgroundColor, textColor, text) = when (status) {
         EventStatus.UPCOMING -> Triple(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f), MaterialTheme.colorScheme.secondary, "MENDATANG")
         EventStatus.ONGOING -> Triple(Color(0xFFE8F5E9), Color(0xFF2E7D32), "BERLANGSUNG") // Hijau untuk "Live"
@@ -24,7 +27,7 @@ fun StatusBadge(status: EventStatus) {
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .padding(horizontal = 8.dp, vertical = 4.dp)

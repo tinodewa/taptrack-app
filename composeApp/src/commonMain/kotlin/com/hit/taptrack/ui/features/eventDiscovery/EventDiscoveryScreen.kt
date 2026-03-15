@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.hit.taptrack.ui.features.eventDetail.EventDetailScreen
 import com.hit.taptrack.ui.features.eventDiscovery.components.DiscoveryHeader
 import com.hit.taptrack.ui.features.eventDiscovery.components.DiscoveryTabs
 import com.hit.taptrack.ui.features.eventDiscovery.states.EventDiscoveryEvent
@@ -25,6 +28,7 @@ class EventDiscoveryScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<EventDiscoveryScreenModel>()
         val uiState by screenModel.uiState.collectAsStateWithLifecycle()
 
@@ -58,9 +62,19 @@ class EventDiscoveryScreen : Screen {
                         )
                     } else {
                         if (maxWidth < 800.dp) {
-                            EventDiscoveryCompact(uiState.filteredEvents)
+                            EventDiscoveryCompact(
+                                uiState.filteredEvents,
+                                onEventClick = { event ->
+                                    navigator.push(EventDetailScreen(event.id))
+                                }
+                            )
                         } else {
-                            EventDiscoveryExpanded(uiState.filteredEvents)
+                            EventDiscoveryExpanded(
+                                uiState.filteredEvents,
+                                onEventClick = { event ->
+                                    navigator.push(EventDetailScreen(event.id))
+                                }
+                            )
                         }
                     }
                 }
