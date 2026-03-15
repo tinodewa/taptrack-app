@@ -1,6 +1,7 @@
 package com.hit.taptrack.di
 
 import com.hit.taptrack.ui.features.auth.login.LoginScreenModel
+import com.hit.taptrack.ui.features.auth.register.RegisterScreenModel
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -22,6 +23,7 @@ fun initKoin(config: KoinAppDeclaration = {}) : KoinApplication = startKoin {
 // 2. Modul Common: Isinya ScreenModel/ViewModel
 val commonModule = module {
     factoryOf(::LoginScreenModel)
+    factoryOf(::RegisterScreenModel)
 }
 
 // 3. Definisi Expect: "Saya harap ada variabel bernama platformModule di setiap platform"

@@ -42,6 +42,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.auth.login.states.LoginEvent
 import com.hit.taptrack.ui.features.auth.login.states.LoginUiState
+import com.hit.taptrack.ui.features.auth.register.RegisterScreen
 
 // --- BAGIAN FORMULIR ---
 @Composable
@@ -134,7 +135,7 @@ fun LoginFormSection(
             Text("Belum memiliki lisensi? ", color = Color.Gray)
             TextButton(
                 onClick = {
-                    // navigator.push(RegisterScreen()) // Aktifkan jika layar registrasi sudah ada
+                    navigator.push(RegisterScreen()) // Aktifkan jika layar registrasi sudah ada
                 },
                 enabled = !uiState.isLoading
             ) {
