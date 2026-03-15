@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.callbackFlow
 class AndroidNetworkMonitor(private val context: Context) : NetworkMonitor {
 
     override val isOnline: Flow<Boolean> = callbackFlow {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -32,8 +33,9 @@ class AndroidNetworkMonitor(private val context: Context) : NetworkMonitor {
         connectivityManager.registerNetworkCallback(request, callback)
 
         // 2. Emit initial state
-        val currentState = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        val currentState =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
         trySend(currentState)
 
         // 3. Cleanup when Flow is cancelled

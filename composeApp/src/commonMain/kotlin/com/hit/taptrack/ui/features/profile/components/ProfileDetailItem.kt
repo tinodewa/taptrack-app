@@ -22,13 +22,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileDetailItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, value: String, isCritical: Boolean = false) {
-    val iconColor = if (isCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-    val valueColor = if (isCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+fun ProfileDetailItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    value: String,
+    isCritical: Boolean = false
+) {
+    val iconColor =
+        if (isCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val valueColor =
+        if (isCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
 
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Box(
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).background(iconColor.copy(alpha = 0.1f)),
+            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp))
+                .background(iconColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(icon, contentDescription = null, tint = iconColor)
@@ -36,7 +47,12 @@ fun ProfileDetailItem(icon: androidx.compose.ui.graphics.vector.ImageVector, tit
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(text = title, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text(text = value, style = MaterialTheme.typography.titleMedium, color = valueColor, fontWeight = if (isCritical) FontWeight.Bold else FontWeight.Normal)
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                color = valueColor,
+                fontWeight = if (isCritical) FontWeight.Bold else FontWeight.Normal
+            )
         }
     }
 }

@@ -99,7 +99,10 @@ fun RegisterFormSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Row untuk Golongan Darah & Kontak Darurat (Agar hemat ruang vertikal)
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             // Dropdown Golongan Darah
             ExposedDropdownMenuBox(
                 expanded = expandedBloodType,

@@ -36,7 +36,11 @@ class EventDetailScreenModel(private val eventId: String) : ScreenModel {
                 date = "15 April 2026",
                 location = "Sirkuit Internasional Batu, Malang, Jawa Timur",
                 rules = "Wajib menggunakan perlengkapan keselamatan standar FIM. Toleransi keterlambatan scrutineering maksimal 30 menit.",
-                categories = listOf("Bebek Modif 4T 130cc", "Sport Trail 250cc Open", "FFA (Free For All)"),
+                categories = listOf(
+                    "Bebek Modif 4T 130cc",
+                    "Sport Trail 250cc Open",
+                    "FFA (Free For All)"
+                ),
                 status = EventStatus.COMPLETED,
                 registeredRacers = 120,
                 maxCapacity = 200
@@ -60,6 +64,7 @@ class EventDetailScreenModel(private val eventId: String) : ScreenModel {
             EventDetailEvent.ManageEvent -> {
                 // TODO: Navigasi/Trigger ke fitur Kelola Acara (Committee Only)
             }
+
             EventDetailEvent.ClearError -> _uiState.update { it.copy(errorMessage = null) }
         }
     }
@@ -72,7 +77,12 @@ class EventDetailScreenModel(private val eventId: String) : ScreenModel {
                 delay(1500) // Simulasi network
                 _uiState.update { it.copy(isJoinLoading = false, isJoinSuccess = true) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isJoinLoading = false, errorMessage = "Gagal mendaftar ke acara ini.") }
+                _uiState.update {
+                    it.copy(
+                        isJoinLoading = false,
+                        errorMessage = "Gagal mendaftar ke acara ini."
+                    )
+                }
             }
         }
     }

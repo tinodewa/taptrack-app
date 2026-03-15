@@ -28,7 +28,13 @@ class ScanScreenModel(private val eventId: String) : ScreenModel {
                     executeScan(input) // Anggap input manual adalah ID/Payload
                 }
             }
-            ScanEvent.DismissResult -> _uiState.update { it.copy(scanResult = null, manualInput = "") }
+
+            ScanEvent.DismissResult -> _uiState.update {
+                it.copy(
+                    scanResult = null,
+                    manualInput = ""
+                )
+            }
         }
     }
 
@@ -44,13 +50,20 @@ class ScanScreenModel(private val eventId: String) : ScreenModel {
             // Simulasi Logika: Jika payload mengandung kata "ERROR", kita anggap gagal.
             if (payload.contains("ERROR", ignoreCase = true)) {
                 _uiState.update {
-                    it.copy(isLoading = false, scanResult = ScanResult.Error("QR Code tidak valid atau peserta tidak terdaftar."))
+                    it.copy(
+                        isLoading = false,
+                        scanResult = ScanResult.Error("QR Code tidak valid atau peserta tidak terdaftar.")
+                    )
                 }
             } else {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        scanResult = ScanResult.Success(racerName = "Andi Gilang", racerNumber = "99", time = "14:32:05 WIB")
+                        scanResult = ScanResult.Success(
+                            racerName = "Andi Gilang",
+                            racerNumber = "99",
+                            time = "14:32:05 WIB"
+                        )
                     )
                 }
             }

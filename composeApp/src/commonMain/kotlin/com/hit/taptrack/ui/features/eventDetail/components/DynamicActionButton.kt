@@ -43,7 +43,11 @@ fun DynamicActionButton(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 if (uiState.isJoinLoading) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
                 } else {
                     Text(
                         // Ubah teks secara dinamis
@@ -55,6 +59,7 @@ fun DynamicActionButton(
                 }
             }
         }
+
         UserRole.COMMITTEE -> {
             Button(
                 onClick = onNavigateToManageEvent,
@@ -62,7 +67,10 @@ fun DynamicActionButton(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("KELOLA ACARA", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                Text(
+                    "KELOLA ACARA",
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                )
             }
         }
     }

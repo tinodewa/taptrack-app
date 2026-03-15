@@ -139,7 +139,11 @@ fun LoginFormSection(
                 },
                 enabled = !uiState.isLoading
             ) {
-                Text("Daftar Pembalap", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    "Daftar Pembalap",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         }
     }

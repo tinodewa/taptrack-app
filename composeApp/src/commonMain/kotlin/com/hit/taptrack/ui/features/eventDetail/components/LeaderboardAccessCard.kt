@@ -37,11 +37,14 @@ fun LeaderboardAccessCard(status: EventStatus, onClick: () -> Unit) {
     val isLive = status == EventStatus.ONGOING
 
     // Tentukan tema berdasarkan status (Merah untuk Live, Biru/Secondary untuk Selesai)
-    val containerColor = if (isLive) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
-    val contentColor = if (isLive) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer
+    val containerColor =
+        if (isLive) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
+    val contentColor =
+        if (isLive) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer
     val icon = if (isLive) Icons.Default.Sensors else Icons.Default.EmojiEvents
     val title = if (isLive) "LIVE LEADERBOARD" else "HASIL KLASEMEN AKHIR"
-    val subtitle = if (isLive) "Pantau waktu pembalap secara real-time" else "Lihat catatan waktu dan posisi final"
+    val subtitle =
+        if (isLive) "Pantau waktu pembalap secara real-time" else "Lihat catatan waktu dan posisi final"
 
     Card(
         onClick = onClick,
@@ -62,7 +65,12 @@ fun LeaderboardAccessCard(status: EventStatus, onClick: () -> Unit) {
                     .background(contentColor.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(28.dp))
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(28.dp)
+                )
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -82,7 +90,11 @@ fun LeaderboardAccessCard(status: EventStatus, onClick: () -> Unit) {
             }
 
             // Panah Kanan
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Buka", tint = contentColor)
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = "Buka",
+                tint = contentColor
+            )
         }
     }
 }

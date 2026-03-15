@@ -20,10 +20,16 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ScanHeader(onBackClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(16.dp),
+        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onBackClick) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali") }
+        IconButton(onClick = onBackClick) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Kembali"
+            )
+        }
         Spacer(modifier = Modifier.width(8.dp))
         Text("Pemindai Checkpoint", style = MaterialTheme.typography.titleLarge)
     }

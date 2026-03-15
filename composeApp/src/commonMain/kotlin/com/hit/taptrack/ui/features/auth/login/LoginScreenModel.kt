@@ -21,12 +21,15 @@ class LoginScreenModel : ScreenModel {
             is LoginEvent.EmailChanged -> {
                 _uiState.update { it.copy(email = event.email, errorMessage = null) }
             }
+
             is LoginEvent.PasswordChanged -> {
                 _uiState.update { it.copy(password = event.password, errorMessage = null) }
             }
+
             is LoginEvent.ClearError -> {
                 _uiState.update { it.copy(errorMessage = null) }
             }
+
             LoginEvent.SubmitLogin -> performLogin()
 
         }
@@ -58,7 +61,10 @@ class LoginScreenModel : ScreenModel {
             } catch (e: Exception) {
                 // Jika gagal:
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.message ?: "Terjadi kesalahan saat login")
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message ?: "Terjadi kesalahan saat login"
+                    )
                 }
             }
         }

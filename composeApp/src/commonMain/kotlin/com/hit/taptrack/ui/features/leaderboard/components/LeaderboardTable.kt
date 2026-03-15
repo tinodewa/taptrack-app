@@ -30,9 +30,25 @@ fun LeaderboardTable(entries: List<LeaderboardEntryModel>) {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("POS", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.width(40.dp))
-            Text("PEMBALAP", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.weight(1f))
-            Text("WAKTU / GAP", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.width(100.dp), textAlign = TextAlign.End)
+            Text(
+                "POS",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray,
+                modifier = Modifier.width(40.dp)
+            )
+            Text(
+                "PEMBALAP",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                "WAKTU / GAP",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray,
+                modifier = Modifier.width(100.dp),
+                textAlign = TextAlign.End
+            )
         }
 
         Divider(color = Color.Gray.copy(alpha = 0.3f))

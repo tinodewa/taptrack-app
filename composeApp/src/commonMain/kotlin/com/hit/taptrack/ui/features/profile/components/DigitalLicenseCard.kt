@@ -37,7 +37,8 @@ fun DigitalLicenseCard(profile: UserProfileModel) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Avatar Placeholder
                 Box(
-                    modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.size(64.dp).clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -48,15 +49,34 @@ fun DigitalLicenseCard(profile: UserProfileModel) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(text = profile.fullName, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black), color = MaterialTheme.colorScheme.onSecondaryContainer)
-                    Text(text = profile.role, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
+                    Text(
+                        text = profile.fullName,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        text = profile.role,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
             Divider(color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "LICENSE ID", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f))
-            Text(text = profile.licenseId, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace), color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Text(
+                text = "LICENSE ID",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
+            )
+            Text(
+                text = profile.licenseId,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                ),
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }

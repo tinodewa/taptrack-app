@@ -28,6 +28,7 @@ class EventDiscoveryScreenModel : ScreenModel {
                 _uiState.update { it.copy(selectedTabIndex = event.index) }
                 applyFilter()
             }
+
             EventDiscoveryEvent.RefreshEvents -> loadEvents()
         }
     }
@@ -40,10 +41,38 @@ class EventDiscoveryScreenModel : ScreenModel {
             delay(1000) // Simulasi loading network
 
             val dummyData = listOf(
-                EventModel("EVT-001", "Kejuaraan Daerah Motocross Jatim", "15 Apr 2026", "Sirkuit Batu, Malang", EventStatus.UPCOMING, 120),
-                EventModel("EVT-002", "Enduro Challenge 2026", "20 Mei 2026", "Hutan Pinus, Mojokerto", EventStatus.UPCOMING, 85),
-                EventModel("EVT-003", "TapTrack Open Championship", "15 Mar 2026", "Sirkuit Bung Tomo, Surabaya", EventStatus.ONGOING, 200),
-                EventModel("EVT-004", "National Drag Bike", "10 Feb 2026", "Kenjeran Park, Surabaya", EventStatus.COMPLETED, 350)
+                EventModel(
+                    "EVT-001",
+                    "Kejuaraan Daerah Motocross Jatim",
+                    "15 Apr 2026",
+                    "Sirkuit Batu, Malang",
+                    EventStatus.UPCOMING,
+                    120
+                ),
+                EventModel(
+                    "EVT-002",
+                    "Enduro Challenge 2026",
+                    "20 Mei 2026",
+                    "Hutan Pinus, Mojokerto",
+                    EventStatus.UPCOMING,
+                    85
+                ),
+                EventModel(
+                    "EVT-003",
+                    "TapTrack Open Championship",
+                    "15 Mar 2026",
+                    "Sirkuit Bung Tomo, Surabaya",
+                    EventStatus.ONGOING,
+                    200
+                ),
+                EventModel(
+                    "EVT-004",
+                    "National Drag Bike",
+                    "10 Feb 2026",
+                    "Kenjeran Park, Surabaya",
+                    EventStatus.COMPLETED,
+                    350
+                )
             )
 
             _uiState.update {

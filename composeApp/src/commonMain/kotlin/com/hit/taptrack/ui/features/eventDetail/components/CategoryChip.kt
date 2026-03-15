@@ -20,6 +20,10 @@ fun CategoryChip(text: String) {
             .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(text = text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
     }
 }

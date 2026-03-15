@@ -29,7 +29,7 @@ fun EventDiscoveryCompact(
             EventCard(event = event, onClick = {
                 /* TODO: Navigasi ke Detail Event */
                 onEventClick(event)
-                }
+            }
             )
         }
     }

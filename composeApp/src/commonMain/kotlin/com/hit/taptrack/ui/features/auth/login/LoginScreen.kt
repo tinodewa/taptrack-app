@@ -38,7 +38,7 @@ class LoginScreen : Screen {
             if (uiState.isLoginSuccess) {
                 navigator.pop()
                 // TODO: Arahkan user berdasarkan peran (Role) yang didapat
-                 navigator.replace(EventDiscoveryScreen())
+                navigator.replace(EventDiscoveryScreen())
             }
         }
 

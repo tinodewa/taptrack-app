@@ -66,7 +66,10 @@ fun EventDetailCompact(
                     .height(250.dp)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            )
                         )
                     )
             ) {
@@ -74,21 +77,35 @@ fun EventDetailCompact(
                     onClick = onBackClick,
                     modifier = Modifier.padding(16.dp).align(Alignment.TopStart)
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = MaterialTheme.colorScheme.onPrimary)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
-                StatusBadge(status = detail.status, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
+                StatusBadge(
+                    status = detail.status,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
+                )
             }
 
             // Konten Detail
             Column(modifier = Modifier.padding(24.dp)) {
-                Text(text = detail.name, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
+                Text(
+                    text = detail.name,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 InfoRow(icon = Icons.Default.CalendarToday, text = detail.date)
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
                 Spacer(modifier = Modifier.height(8.dp))
-                InfoRow(icon = Icons.Default.Group, text = "${detail.registeredRacers} / ${detail.maxCapacity} Peserta Terdaftar")
+                InfoRow(
+                    icon = Icons.Default.Group,
+                    text = "${detail.registeredRacers} / ${detail.maxCapacity} Peserta Terdaftar"
+                )
 
                 // SISIPKAN KARTU LEADERBOARD DI SINI (Tepat di bawah info utama)
                 LeaderboardAccessCard(status = detail.status, onClick = onNavigateToLeaderboard)
@@ -99,7 +116,11 @@ fun EventDetailCompact(
 
                 Text(text = "Deskripsi", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = detail.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
+                Text(
+                    text = detail.description,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -113,7 +134,11 @@ fun EventDetailCompact(
 
                 Text(text = "Regulasi", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = detail.rules, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
+                Text(
+                    text = detail.rules,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
 
@@ -141,7 +166,10 @@ fun EventDetailExpanded(
     onNavigateToManageEvent: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+    Row(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
         // Kiri: Hero & Info Utama
         Card(
             modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -149,22 +177,48 @@ fun EventDetailExpanded(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Box(modifier = Modifier.fillMaxWidth().height(300.dp).background(Brush.verticalGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))))) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(300.dp).background(
+                        Brush.verticalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            )
+                        )
+                    )
+                ) {
                     IconButton(onClick = onBackClick, modifier = Modifier.padding(16.dp)) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Kembali",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
                 Column(modifier = Modifier.padding(32.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(text = detail.name, style = MaterialTheme.typography.displaySmall, modifier = Modifier.weight(1f))
-                        StatusBadge(status = detail.status, modifier = Modifier.padding(start = 16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = detail.name,
+                            style = MaterialTheme.typography.displaySmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatusBadge(
+                            status = detail.status,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     InfoRow(icon = Icons.Default.CalendarToday, text = detail.date)
                     Spacer(modifier = Modifier.height(12.dp))
                     InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
                     Spacer(modifier = Modifier.height(12.dp))
-                    InfoRow(icon = Icons.Default.Group, text = "${detail.registeredRacers} / ${detail.maxCapacity} Terdaftar")
+                    InfoRow(
+                        icon = Icons.Default.Group,
+                        text = "${detail.registeredRacers} / ${detail.maxCapacity} Terdaftar"
+                    )
 
                     // SISIPKAN KARTU LEADERBOARD DI SINI (Tepat di bawah info utama)
                     LeaderboardAccessCard(status = detail.status, onClick = onNavigateToLeaderboard)
@@ -192,7 +246,11 @@ fun EventDetailExpanded(
 
                 Text(text = "Regulasi Khusus", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = detail.rules, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
+                Text(
+                    text = detail.rules,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
 
                 Spacer(modifier = Modifier.weight(1f)) // Dorong tombol ke paling bawah
 

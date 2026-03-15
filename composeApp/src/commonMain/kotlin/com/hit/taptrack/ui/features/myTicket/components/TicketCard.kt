@@ -30,17 +30,35 @@ fun TicketCard(ticket: TicketModel, onClick: () -> Unit) {
             Column(
                 modifier = Modifier.weight(1f).padding(16.dp)
             ) {
-                Text(text = ticket.eventName, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    text = ticket.eventName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = ticket.date, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f))
-                Text(text = ticket.category, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f))
+                Text(
+                    text = ticket.date,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                )
+                Text(
+                    text = ticket.category,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Status Badge Lokal untuk Tiket
                 Box(
-                    modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(Color.White.copy(alpha = 0.2f)).padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.2f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text(text = ticket.status, style = MaterialTheme.typography.labelSmall, color = Color.White)
+                    Text(
+                        text = ticket.status,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White
+                    )
                 }
             }
 
@@ -52,14 +70,28 @@ fun TicketCard(ticket: TicketModel, onClick: () -> Unit) {
 
             // Bagian Kanan (Aksi QR / Nomor Start)
             Column(
-                modifier = Modifier.width(100.dp).fillMaxHeight().background(MaterialTheme.colorScheme.primary),
+                modifier = Modifier.width(100.dp).fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.primary),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "START", style = MaterialTheme.typography.labelSmall, color = Color.White)
-                Text(text = "#${ticket.racerNumber}", style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Black), color = Color.White)
+                Text(
+                    text = "START",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White
+                )
+                Text(
+                    text = "#${ticket.racerNumber}",
+                    style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Black),
+                    color = Color.White
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                Icon(Icons.Default.QrCode2, contentDescription = "Tampilkan QR", tint = Color.White, modifier = Modifier.size(32.dp))
+                Icon(
+                    Icons.Default.QrCode2,
+                    contentDescription = "Tampilkan QR",
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
             }
         }
     }

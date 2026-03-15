@@ -104,7 +104,11 @@ fun RegisterExpanded(
                 onClick = onBackClick,
                 modifier = Modifier.align(Alignment.TopStart).padding(24.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
 

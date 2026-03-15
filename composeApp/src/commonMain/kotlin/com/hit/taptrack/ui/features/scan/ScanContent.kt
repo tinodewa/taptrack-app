@@ -47,31 +47,59 @@ fun ScanCompact(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)) {
 
         // Pemilihan Checkpoint (Sangat Krusial)
-        Text("Pilih Lokasi Pindai:", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            "Pilih Lokasi Pindai:",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        CheckpointSelector(selected = uiState.selectedCheckpoint, onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) })
+        CheckpointSelector(
+            selected = uiState.selectedCheckpoint,
+            onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) })
 
         Spacer(modifier = Modifier.height(32.dp))
 
         // Placeholder Kamera
-        Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(16.dp)).background(Color.Black), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(16.dp))
+                .background(Color.Black), contentAlignment = Alignment.Center
+        ) {
             // TODO: Ganti Box ini dengan KMP Camera / Scanner Library
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(64.dp))
+                Icon(
+                    Icons.Default.CameraAlt,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier.size(64.dp)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Kamera Aktif", color = Color.White.copy(alpha = 0.5f))
 
                 // Tombol Flashlight (Simulasi)
-                IconButton(onClick = { /* Toggle Flash */ }, modifier = Modifier.padding(top = 16.dp).background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(50))) {
-                    Icon(Icons.Default.FlashlightOn, contentDescription = "Senter", tint = Color.White)
+                IconButton(
+                    onClick = { /* Toggle Flash */ },
+                    modifier = Modifier.padding(top = 16.dp)
+                        .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(50))
+                ) {
+                    Icon(
+                        Icons.Default.FlashlightOn,
+                        contentDescription = "Senter",
+                        tint = Color.White
+                    )
                 }
             }
 
             // Jendela Bidik (Scanner Frame)
-            Box(modifier = Modifier.fillMaxSize(0.7f).border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp)))
+            Box(
+                modifier = Modifier.fillMaxSize(0.7f)
+                    .border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+            )
 
             // Garis Laser (Simulasi)
-            Box(modifier = Modifier.fillMaxWidth(0.6f).height(2.dp).background(MaterialTheme.colorScheme.error))
+            Box(
+                modifier = Modifier.fillMaxWidth(0.6f).height(2.dp)
+                    .background(MaterialTheme.colorScheme.error)
+            )
 
             // Tombol Simulasi Scan Berhasil (UNTUK TESTING)
             Button(
@@ -103,7 +131,11 @@ fun ScanCompact(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
                 } else {
                     Text("KIRIM")
                 }
@@ -117,15 +149,36 @@ fun ScanCompact(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
 fun ScanExpanded(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
     // Implementasi serupa dengan Compact, namun dibagi Row.
     // Kiri: Kamera Scanner. Kanan: Kontrol (Pilih Checkpoint & Input Manual).
-    Row(modifier = Modifier.fillMaxSize().padding(32.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-        Box(modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(24.dp)).background(Color.Black), contentAlignment = Alignment.Center) {
+    Row(
+        modifier = Modifier.fillMaxSize().padding(32.dp),
+        horizontalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        Box(
+            modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(24.dp))
+                .background(Color.Black), contentAlignment = Alignment.Center
+        ) {
             // Sama seperti placeholder kamera di atas
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(64.dp))
-                Text("Kamera Desktop / Scanner USB Aktif", color = Color.White.copy(alpha = 0.5f), modifier = Modifier.padding(top = 16.dp))
+                Icon(
+                    Icons.Default.CameraAlt,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier.size(64.dp)
+                )
+                Text(
+                    "Kamera Desktop / Scanner USB Aktif",
+                    color = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
-            Box(modifier = Modifier.fillMaxSize(0.6f).border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp)))
-            Button(onClick = { onEvent(ScanEvent.ProcessScan("TAPTRACK-REG-9912A")) }, modifier = Modifier.align(Alignment.BottomCenter).padding(32.dp)) { Text("Simulasi Scan QR") }
+            Box(
+                modifier = Modifier.fillMaxSize(0.6f)
+                    .border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp))
+            )
+            Button(
+                onClick = { onEvent(ScanEvent.ProcessScan("TAPTRACK-REG-9912A")) },
+                modifier = Modifier.align(Alignment.BottomCenter).padding(32.dp)
+            ) { Text("Simulasi Scan QR") }
         }
 
         Column(modifier = Modifier.weight(0.8f).fillMaxHeight()) {
@@ -133,15 +186,31 @@ fun ScanExpanded(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
             Text("Lokasi Checkpoint:", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            CheckpointSelector(selected = uiState.selectedCheckpoint, onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) })
+            CheckpointSelector(
+                selected = uiState.selectedCheckpoint,
+                onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) })
 
             Spacer(modifier = Modifier.height(48.dp))
             Text("Input Manual (Fallback)", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = uiState.manualInput, onValueChange = { onEvent(ScanEvent.ManualInputChanged(it)) }, placeholder = { Text("Nomor Start / ID") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp))
+            OutlinedTextField(
+                value = uiState.manualInput,
+                onValueChange = { onEvent(ScanEvent.ManualInputChanged(it)) },
+                placeholder = { Text("Nomor Start / ID") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { onEvent(ScanEvent.SubmitManualScan) }, modifier = Modifier.fillMaxWidth().height(56.dp), enabled = !uiState.isLoading && uiState.manualInput.isNotBlank()) {
-                if (uiState.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary) else Text("KIRIM LOG MANUAL", fontWeight = FontWeight.Bold)
+            Button(
+                onClick = { onEvent(ScanEvent.SubmitManualScan) },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                enabled = !uiState.isLoading && uiState.manualInput.isNotBlank()
+            ) {
+                if (uiState.isLoading) CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                ) else Text("KIRIM LOG MANUAL", fontWeight = FontWeight.Bold)
             }
         }
     }

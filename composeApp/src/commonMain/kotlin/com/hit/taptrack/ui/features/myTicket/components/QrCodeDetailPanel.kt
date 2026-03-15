@@ -30,7 +30,11 @@ fun QrCodeDetailPanel(ticket: TicketModel, isDialog: Boolean = false) {
         modifier = Modifier.padding(32.dp).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Siapkan untuk di-scan", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = "Siapkan untuk di-scan",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(modifier = Modifier.height(24.dp))
 
         // Placeholder QR Code (Wajib background putih kontras tinggi agar bisa di-scan scanner fisik)
@@ -43,14 +47,31 @@ fun QrCodeDetailPanel(ticket: TicketModel, isDialog: Boolean = false) {
         ) {
             // TODO: Ganti ini dengan library pembuat QR Code (misal: qrose) menggunakan ticket.qrCodePayload
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(100.dp), tint = Color.Black)
-                Text("QR CODE PLACEMENT", color = Color.Black, style = MaterialTheme.typography.labelSmall)
+                Icon(
+                    Icons.Default.QrCode2,
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp),
+                    tint = Color.Black
+                )
+                Text(
+                    "QR CODE PLACEMENT",
+                    color = Color.Black,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Text(text = ticket.eventName, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
+        Text(
+            text = ticket.eventName,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
         Text(text = "Kelas: ${ticket.category}", style = MaterialTheme.typography.bodyLarge)
-        Text(text = "ID: ${ticket.registrationId}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+        Text(
+            text = "ID: ${ticket.registrationId}",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }

@@ -20,7 +20,11 @@ import com.hit.taptrack.ui.features.profile.states.ProfileEvent
 
 // --- TAMPILAN MOBILE ---
 @Composable
-fun ProfileCompact(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, onBackClick: () -> Unit) {
+fun ProfileCompact(
+    profile: UserProfileModel,
+    onEvent: (ProfileEvent) -> Unit,
+    onBackClick: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)
     ) {
@@ -29,7 +33,11 @@ fun ProfileCompact(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, o
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
         }
 
-        Text("Lisensi Digital", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+        Text(
+            "Lisensi Digital",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
         Spacer(modifier = Modifier.height(24.dp))
 
         // Kartu Profil Utama (Hero)
@@ -40,10 +48,23 @@ fun ProfileCompact(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, o
         Spacer(modifier = Modifier.height(16.dp))
 
         // List Detail
-        ProfileDetailItem(icon = Icons.Default.Bloodtype, title = "Golongan Darah", value = profile.bloodType, isCritical = true)
-        ProfileDetailItem(icon = Icons.Default.Emergency, title = "Kontak Darurat", value = profile.emergencyContact)
+        ProfileDetailItem(
+            icon = Icons.Default.Bloodtype,
+            title = "Golongan Darah",
+            value = profile.bloodType,
+            isCritical = true
+        )
+        ProfileDetailItem(
+            icon = Icons.Default.Emergency,
+            title = "Kontak Darurat",
+            value = profile.emergencyContact
+        )
         ProfileDetailItem(icon = Icons.Default.Email, title = "Surel", value = profile.email)
-        ProfileDetailItem(icon = Icons.Default.TwoWheeler, title = "Atribut Kendaraan", value = profile.vehicle)
+        ProfileDetailItem(
+            icon = Icons.Default.TwoWheeler,
+            title = "Atribut Kendaraan",
+            value = profile.vehicle
+        )
 
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -54,17 +75,32 @@ fun ProfileCompact(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, o
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
+            Icon(
+                Icons.AutoMirrored.Filled.ExitToApp,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onError
+            )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("KELUAR", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onError)
+            Text(
+                "KELUAR",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onError
+            )
         }
     }
 }
 
 // --- TAMPILAN DESKTOP (Split View) ---
 @Composable
-fun ProfileExpanded(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, onBackClick: () -> Unit) {
-    Row(modifier = Modifier.fillMaxSize().padding(32.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+fun ProfileExpanded(
+    profile: UserProfileModel,
+    onEvent: (ProfileEvent) -> Unit,
+    onBackClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxSize().padding(32.dp),
+        horizontalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
         // Kiri: Kartu Lisensi & Logout
         Column(modifier = Modifier.weight(0.8f)) {
             IconButton(onClick = onBackClick, modifier = Modifier.offset(x = (-12).dp)) {
@@ -79,9 +115,17 @@ fun ProfileExpanded(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, 
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
+                Icon(
+                    Icons.AutoMirrored.Filled.ExitToApp,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onError
+                )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("KELUAR", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onError)
+                Text(
+                    "KELUAR",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onError
+                )
             }
         }
 
@@ -94,10 +138,27 @@ fun ProfileExpanded(profile: UserProfileModel, onEvent: (ProfileEvent) -> Unit, 
             Column(modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState())) {
                 Text("Informasi Vital & Data Diri", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(24.dp))
-                ProfileDetailItem(icon = Icons.Default.Bloodtype, title = "Golongan Darah", value = profile.bloodType, isCritical = true)
-                ProfileDetailItem(icon = Icons.Default.Emergency, title = "Kontak Darurat", value = profile.emergencyContact)
-                ProfileDetailItem(icon = Icons.Default.Email, title = "Surel", value = profile.email)
-                ProfileDetailItem(icon = Icons.Default.TwoWheeler, title = "Atribut Kendaraan", value = profile.vehicle)
+                ProfileDetailItem(
+                    icon = Icons.Default.Bloodtype,
+                    title = "Golongan Darah",
+                    value = profile.bloodType,
+                    isCritical = true
+                )
+                ProfileDetailItem(
+                    icon = Icons.Default.Emergency,
+                    title = "Kontak Darurat",
+                    value = profile.emergencyContact
+                )
+                ProfileDetailItem(
+                    icon = Icons.Default.Email,
+                    title = "Surel",
+                    value = profile.email
+                )
+                ProfileDetailItem(
+                    icon = Icons.Default.TwoWheeler,
+                    title = "Atribut Kendaraan",
+                    value = profile.vehicle
+                )
             }
         }
     }

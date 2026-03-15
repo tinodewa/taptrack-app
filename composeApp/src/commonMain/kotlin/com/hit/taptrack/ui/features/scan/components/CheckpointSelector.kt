@@ -23,7 +23,10 @@ fun CheckpointSelector(selected: CheckpointType, onSelect: (CheckpointType) -> U
                 onClick = { onSelect(type) },
                 label = { Text(type.displayName) },
                 modifier = Modifier.weight(1f),
-                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary)
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         }
     }

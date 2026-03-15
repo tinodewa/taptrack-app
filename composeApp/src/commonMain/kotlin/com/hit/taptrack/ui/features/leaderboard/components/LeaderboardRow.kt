@@ -31,8 +31,10 @@ import com.hit.taptrack.data.model.LeaderboardEntryModel
 fun LeaderboardRow(entry: LeaderboardEntryModel) {
     // Penentuan Warna Khusus
     val isPurpleSector = entry.isFastestLap
-    val cardColor = if (entry.position == 1) MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
-    val highlightColor = if (isPurpleSector) Color(0xFF9C27B0) else if (entry.position == 1) MaterialTheme.colorScheme.secondary else Color.Transparent
+    val cardColor =
+        if (entry.position == 1) MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
+    val highlightColor =
+        if (isPurpleSector) Color(0xFF9C27B0) else if (entry.position == 1) MaterialTheme.colorScheme.secondary else Color.Transparent
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -67,25 +69,58 @@ fun LeaderboardRow(entry: LeaderboardEntryModel) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Kotak Nomor Start
-                    Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface).padding(horizontal = 6.dp, vertical = 2.dp)) {
-                        Text(text = entry.racerNumber, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.surface)
+                    Box(
+                        modifier = Modifier.clip(RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.onSurface)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = entry.racerNumber,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.surface
+                        )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = entry.racerName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        text = entry.racerName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = entry.vehicle, style = MaterialTheme.typography.bodySmall, color = Color.Gray, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = entry.vehicle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
             // Kolom 3: Waktu / Gap & Status (Menggunakan Monospace agar presisi)
             Column(horizontalAlignment = Alignment.End, modifier = Modifier.width(100.dp)) {
                 when (entry.status) {
-                    RacerStatus.DNF -> Text("DNF", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black), color = MaterialTheme.colorScheme.error)
-                    RacerStatus.DSQ -> Text("DSQ", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black), color = Color.Black)
+                    RacerStatus.DNF -> Text(
+                        "DNF",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    RacerStatus.DSQ -> Text(
+                        "DSQ",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                        color = Color.Black
+                    )
+
                     else -> {
                         Text(
                             text = entry.bestTime,
-                            style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold
+                            ),
                             color = if (isPurpleSector) Color(0xFF9C27B0) else MaterialTheme.colorScheme.onSurface
                         )
                         if (entry.position > 1) {
@@ -95,7 +130,11 @@ fun LeaderboardRow(entry: LeaderboardEntryModel) {
                                 color = Color.Gray
                             )
                         } else {
-                            Text("LEADER", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
+                            Text(
+                                "LEADER",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
                         }
                     }
                 }

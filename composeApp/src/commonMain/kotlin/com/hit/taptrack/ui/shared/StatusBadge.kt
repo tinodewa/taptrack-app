@@ -21,9 +21,22 @@ fun StatusBadge(
     modifier: Modifier = Modifier
 ) {
     val (backgroundColor, textColor, text) = when (status) {
-        EventStatus.UPCOMING -> Triple(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f), MaterialTheme.colorScheme.secondary, "MENDATANG")
-        EventStatus.ONGOING -> Triple(Color(0xFFE8F5E9), Color(0xFF2E7D32), "BERLANGSUNG") // Hijau untuk "Live"
-        EventStatus.COMPLETED -> Triple(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), MaterialTheme.colorScheme.onSurfaceVariant, "SELESAI")
+        EventStatus.UPCOMING -> Triple(
+            MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+            MaterialTheme.colorScheme.secondary,
+            "MENDATANG"
+        )
+
+        EventStatus.ONGOING -> Triple(
+            Color(0xFFE8F5E9),
+            Color(0xFF2E7D32),
+            "BERLANGSUNG"
+        ) // Hijau untuk "Live"
+        EventStatus.COMPLETED -> Triple(
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            "SELESAI"
+        )
     }
 
     Box(

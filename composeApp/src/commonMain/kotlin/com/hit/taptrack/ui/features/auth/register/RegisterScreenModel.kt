@@ -34,7 +34,8 @@ class RegisterScreenModel : ScreenModel {
 
         // Validasi Form
         if (state.fullName.isBlank() || state.email.isBlank() || state.password.isBlank() ||
-            state.bloodType.isBlank() || state.emergencyContact.isBlank()) {
+            state.bloodType.isBlank() || state.emergencyContact.isBlank()
+        ) {
             _uiState.update { it.copy(errorMessage = "Mohon lengkapi semua data wajib") }
             return
         }
@@ -49,7 +50,10 @@ class RegisterScreenModel : ScreenModel {
                 _uiState.update { it.copy(isLoading = false, isRegisterSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.message ?: "Gagal melakukan registrasi")
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message ?: "Gagal melakukan registrasi"
+                    )
                 }
             }
         }

@@ -33,7 +33,10 @@ fun MyTicketsCompact(uiState: MyTicketsUiState, onEvent: (MyTicketsEvent) -> Uni
 // --- TAMPILAN DESKTOP (Split View) ---
 @Composable
 fun MyTicketsExpanded(uiState: MyTicketsUiState, onEvent: (MyTicketsEvent) -> Unit) {
-    Row(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+    Row(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
         // Kiri: Daftar Tiket
         Card(
             modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -45,7 +48,9 @@ fun MyTicketsExpanded(uiState: MyTicketsUiState, onEvent: (MyTicketsEvent) -> Un
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(uiState.tickets) { ticket ->
-                    TicketCard(ticket = ticket, onClick = { onEvent(MyTicketsEvent.SelectTicket(ticket)) })
+                    TicketCard(
+                        ticket = ticket,
+                        onClick = { onEvent(MyTicketsEvent.SelectTicket(ticket)) })
                 }
             }
         }
@@ -60,7 +65,12 @@ fun MyTicketsExpanded(uiState: MyTicketsUiState, onEvent: (MyTicketsEvent) -> Un
                     QrCodeDetailPanel(ticket = uiState.selectedTicket!!)
                 } else {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.ConfirmationNumber, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.Gray)
+                        Icon(
+                            Icons.Default.ConfirmationNumber,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = Color.Gray
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Pilih tiket di samping untuk melihat QR Code", color = Color.Gray)
                     }
