@@ -1,4 +1,4 @@
-package com.hit.taptrack.ui.features.manageEvent
+package com.hit.taptrack.ui.features.eventManage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,11 +19,11 @@ import com.hit.taptrack.ui.features.scan.ScanScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
 
-data class ManageEventScreen(val eventId: String) : Screen {
+data class EventManageScreen(val eventId: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = koinScreenModel<ManageEventScreenModel> { parametersOf(eventId) }
+        val screenModel = koinScreenModel<EventManageScreenModel> { parametersOf(eventId) }
         val uiState by screenModel.uiState.collectAsStateWithLifecycle()
 
         RmsScaffold(backgroundColor = MaterialTheme.colorScheme.background) { innerPadding ->
@@ -67,13 +67,13 @@ data class ManageEventScreen(val eventId: String) : Screen {
                     } else {
                         // Sekarang maxWidth sudah bisa diakses dari BoxWithConstraintsScope
                         if (maxWidth < 800.dp) {
-                            ManageEventCompact(uiState, screenModel::onEvent) {
+                            EventManageCompact(uiState, screenModel::onEvent) {
                                 navigator.push(
                                     ScanScreen(eventId)
                                 )
                             }
                         } else {
-                            ManageEventExpanded(uiState, screenModel::onEvent) {
+                            EventManageExpanded(uiState, screenModel::onEvent) {
                                 navigator.push(
                                     ScanScreen(eventId)
                                 )

@@ -1,4 +1,4 @@
-package com.hit.taptrack.ui.features.manageEvent
+package com.hit.taptrack.ui.features.eventManage
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,17 +19,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hit.taptrack.ui.features.manageEvent.components.EventStateControllerCard
-import com.hit.taptrack.ui.features.manageEvent.components.ParticipantRow
-import com.hit.taptrack.ui.features.manageEvent.components.ScannerActionCard
-import com.hit.taptrack.ui.features.manageEvent.states.ManageEventEvent
-import com.hit.taptrack.ui.features.manageEvent.states.ManageEventUiState
+import com.hit.taptrack.ui.features.eventManage.components.EventStateControllerCard
+import com.hit.taptrack.ui.features.eventManage.components.ParticipantRow
+import com.hit.taptrack.ui.features.eventManage.components.ScannerActionCard
+import com.hit.taptrack.ui.features.eventManage.states.EventManageEvent
+import com.hit.taptrack.ui.features.eventManage.states.EventManageUiState
 
 // --- TAMPILAN MOBILE ---
 @Composable
-fun ManageEventCompact(
-    uiState: ManageEventUiState,
-    onEvent: (ManageEventEvent) -> Unit,
+fun EventManageCompact(
+    uiState: EventManageUiState,
+    onEvent: (EventManageEvent) -> Unit,
     onNavigateToScanner: () -> Unit
 ) {
     LazyColumn(
@@ -57,9 +57,9 @@ fun ManageEventCompact(
 
 // --- TAMPILAN DESKTOP ---
 @Composable
-fun ManageEventExpanded(
-    uiState: ManageEventUiState,
-    onEvent: (ManageEventEvent) -> Unit,
+fun EventManageExpanded(
+    uiState: EventManageUiState,
+    onEvent: (EventManageEvent) -> Unit,
     onNavigateToScanner: () -> Unit
 ) {
     Row(

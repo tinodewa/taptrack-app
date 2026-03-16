@@ -1,4 +1,4 @@
-package com.hit.taptrack.ui.features.manageEvent.components
+package com.hit.taptrack.ui.features.eventManage.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,13 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.hit.taptrack.common.state.EventStatus
-import com.hit.taptrack.ui.features.manageEvent.states.ManageEventEvent
+import com.hit.taptrack.ui.features.eventManage.states.EventManageEvent
 
 @Composable
 fun EventStateControllerCard(
     currentStatus: EventStatus,
     isChanging: Boolean,
-    onEvent: (ManageEventEvent) -> Unit
+    onEvent: (EventManageEvent) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -45,7 +45,7 @@ fun EventStateControllerCard(
             ) {
                 // Tombol Mulai (Hanya aktif jika Upcoming)
                 Button(
-                    onClick = { onEvent(ManageEventEvent.ChangeEventStatus(EventStatus.ONGOING)) },
+                    onClick = { onEvent(EventManageEvent.ChangeEventStatus(EventStatus.ONGOING)) },
                     enabled = !isChanging && currentStatus == EventStatus.UPCOMING,
                     modifier = Modifier.weight(1f).height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
@@ -57,7 +57,7 @@ fun EventStateControllerCard(
 
                 // Tombol Selesai (Hanya aktif jika Ongoing)
                 Button(
-                    onClick = { onEvent(ManageEventEvent.ChangeEventStatus(EventStatus.COMPLETED)) },
+                    onClick = { onEvent(EventManageEvent.ChangeEventStatus(EventStatus.COMPLETED)) },
                     enabled = !isChanging && currentStatus == EventStatus.ONGOING,
                     modifier = Modifier.weight(1f).height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)

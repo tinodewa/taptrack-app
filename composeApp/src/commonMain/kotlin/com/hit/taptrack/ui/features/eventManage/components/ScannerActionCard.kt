@@ -1,4 +1,4 @@
-package com.hit.taptrack.ui.features.manageEvent.components
+package com.hit.taptrack.ui.features.eventManage.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

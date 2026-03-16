@@ -1,9 +1,9 @@
-package com.hit.taptrack.ui.features.manageEvent.states
+package com.hit.taptrack.ui.features.eventManage.states
 
 import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.data.model.ParticipantModel
 
-data class ManageEventUiState(
+data class EventManageUiState(
     val eventId: String = "",
     val eventName: String = "",
     val eventStatus: EventStatus = EventStatus.UPCOMING,

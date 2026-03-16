@@ -1,12 +1,12 @@
-package com.hit.taptrack.ui.features.manageEvent
+package com.hit.taptrack.ui.features.eventManage
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.common.state.ParticipantStatus
 import com.hit.taptrack.data.model.ParticipantModel
-import com.hit.taptrack.ui.features.manageEvent.states.ManageEventEvent
-import com.hit.taptrack.ui.features.manageEvent.states.ManageEventUiState
+import com.hit.taptrack.ui.features.eventManage.states.EventManageEvent
+import com.hit.taptrack.ui.features.eventManage.states.EventManageUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,20 +14,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ManageEventScreenModel(private val eventId: String) : ScreenModel {
+class EventManageScreenModel(private val eventId: String) : ScreenModel {
 
-    private val _uiState = MutableStateFlow(ManageEventUiState(eventId = eventId))
-    val uiState: StateFlow<ManageEventUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(EventManageUiState(eventId = eventId))
+    val uiState: StateFlow<EventManageUiState> = _uiState.asStateFlow()
 
     init {
         loadEventData()
     }
 
-    fun onEvent(event: ManageEventEvent) {
+    fun onEvent(event: EventManageEvent) {
         when (event) {
-            ManageEventEvent.RefreshData -> loadEventData()
-            is ManageEventEvent.ChangeEventStatus -> updateEventStatus(event.newStatus)
-            is ManageEventEvent.OverrideParticipantStatus -> overrideParticipant(
+            EventManageEvent.RefreshData -> loadEventData()
+            is EventManageEvent.ChangeEventStatus -> updateEventStatus(event.newStatus)
+            is EventManageEvent.OverrideParticipantStatus -> overrideParticipant(
                 event.registrationId,
                 event.newStatus
             )
