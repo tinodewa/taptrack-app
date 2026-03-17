@@ -44,6 +44,7 @@ data class EventDetailScreen(val eventId: String) : Screen {
 
         RmsScaffold(
             backgroundColor = MaterialTheme.colorScheme.background,
+            snackbarHostState = snackbarHostState
         ) { innerPadding ->
             BoxWithConstraints(
                 modifier = Modifier

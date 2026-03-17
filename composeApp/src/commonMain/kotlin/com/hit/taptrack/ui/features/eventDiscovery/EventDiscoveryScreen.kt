@@ -4,20 +4,27 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.hit.taptrack.ui.features.eventCreate.EventCreateScreen
 import com.hit.taptrack.ui.features.eventDetail.EventDetailScreen
 import com.hit.taptrack.ui.features.eventDiscovery.components.DiscoveryHeader
 import com.hit.taptrack.ui.features.eventDiscovery.components.DiscoveryTabs
@@ -35,7 +42,19 @@ class EventDiscoveryScreen : Screen {
         val uiState by screenModel.uiState.collectAsStateWithLifecycle()
 
         RmsScaffold(
-            backgroundColor = MaterialTheme.colorScheme.background
+            backgroundColor = MaterialTheme.colorScheme.background,
+            floatingActionButton = {
+                if (uiState.isCommittee) {
+                    ExtendedFloatingActionButton(
+                        onClick = { navigator.push(EventCreateScreen()) }, // Lompat ke halaman Buat Acara
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        icon = { Icon(Icons.Default.Add, contentDescription = "Tambah") },
+                        text = { Text("Buat Acara", fontWeight = FontWeight.Bold) },
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                }
+            }
         ) { innerPadding ->
             Column(
                 modifier = Modifier

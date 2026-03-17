@@ -78,7 +78,8 @@ class EventDiscoveryScreenModel : ScreenModel {
             _uiState.update {
                 it.copy(
                     allEvents = dummyData,
-                    isLoading = false
+                    isLoading = false,
+                    isCommittee = true // <-- Ubah ke true untuk mensimulasikan login sebagai Panitia
                 )
             }
             applyFilter()

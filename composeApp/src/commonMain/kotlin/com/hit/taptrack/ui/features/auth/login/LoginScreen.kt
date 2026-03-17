@@ -52,6 +52,7 @@ class LoginScreen : Screen {
 
         RmsScaffold(
             backgroundColor = MaterialTheme.colorScheme.surface,
+            snackbarHostState = snackbarHostState
         ) { innerPadding ->
             BoxWithConstraints(
                 modifier = Modifier

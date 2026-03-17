@@ -54,6 +54,7 @@ class EventCreateScreen : Screen {
 
         RmsScaffold(
             backgroundColor = MaterialTheme.colorScheme.background,
+            snackbarHostState = snackbarHostState
         ) { innerPadding ->
             Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                 // Header
