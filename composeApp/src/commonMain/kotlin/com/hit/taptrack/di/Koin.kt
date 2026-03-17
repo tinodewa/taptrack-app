@@ -2,6 +2,7 @@ package com.hit.taptrack.di
 
 import com.hit.taptrack.ui.features.auth.login.LoginScreenModel
 import com.hit.taptrack.ui.features.auth.register.RegisterScreenModel
+import com.hit.taptrack.ui.features.eventCreate.EventCreateScreenModel
 import com.hit.taptrack.ui.features.eventDetail.EventDetailScreenModel
 import com.hit.taptrack.ui.features.eventDiscovery.EventDiscoveryScreenModel
 import com.hit.taptrack.ui.features.leaderboard.LeaderboardScreenModel
@@ -38,6 +39,7 @@ val commonModule = module {
     factoryOf(::ProfileScreenModel)
     factoryOf(::ScanScreenModel)
     factoryOf(::EventManageScreenModel)
+    factoryOf(::EventCreateScreenModel)
 }
 
 // 3. Definisi Expect: "Saya harap ada variabel bernama platformModule di setiap platform"
