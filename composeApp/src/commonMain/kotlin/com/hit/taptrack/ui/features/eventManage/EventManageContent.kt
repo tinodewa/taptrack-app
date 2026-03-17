@@ -50,7 +50,7 @@ fun EventManageCompact(
             )
         }
         items(uiState.participants) { participant ->
-            ParticipantRow(participant)
+            ParticipantRow(participant, onEvent)
         }
     }
 }
@@ -87,7 +87,7 @@ fun EventManageExpanded(
                 Spacer(modifier = Modifier.height(16.dp))
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(uiState.participants) { participant ->
-                        ParticipantRow(participant)
+                        ParticipantRow(participant, onEvent)
                     }
                 }
             }

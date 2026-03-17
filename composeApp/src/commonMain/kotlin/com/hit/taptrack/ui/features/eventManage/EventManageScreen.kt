@@ -15,6 +15,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.hit.taptrack.ui.features.eventManage.components.OverrideParticipantDialog
+import com.hit.taptrack.ui.features.eventManage.states.EventManageEvent
 import com.hit.taptrack.ui.features.scan.ScanScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
@@ -79,6 +81,16 @@ data class EventManageScreen(val eventId: String) : Screen {
                                 )
                             }
                         }
+                    }
+
+                    // --- TAMBAHKAN PEMANGGILAN DIALOG DI SINI ---
+                    if (uiState.selectedParticipant != null) {
+                        OverrideParticipantDialog(
+                            participant = uiState.selectedParticipant!!,
+                            isLoading = uiState.isOverrideLoading,
+                            onEvent = screenModel::onEvent,
+                            onDismiss = { screenModel.onEvent(EventManageEvent.SelectParticipant(null)) }
+                        )
                     }
                 }
             }

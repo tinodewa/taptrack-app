@@ -27,6 +27,7 @@ class EventManageScreenModel(private val eventId: String) : ScreenModel {
         when (event) {
             EventManageEvent.RefreshData -> loadEventData()
             is EventManageEvent.ChangeEventStatus -> updateEventStatus(event.newStatus)
+            is EventManageEvent.SelectParticipant -> _uiState.update { it.copy(selectedParticipant = event.participant) }
             is EventManageEvent.OverrideParticipantStatus -> overrideParticipant(
                 event.registrationId,
                 event.newStatus
@@ -73,12 +74,24 @@ class EventManageScreenModel(private val eventId: String) : ScreenModel {
 
     private fun overrideParticipant(registrationId: String, newStatus: ParticipantStatus) {
         screenModelScope.launch {
-            // TODO: API PUT /api/v1/registrations/override/:registration_id/status
-            // Untuk simulasi, kita update state lokal secara langsung
+            _uiState.update { it.copy(isOverrideLoading = true) }
+
+            // TODO: Integrasi dengan PUT /api/v1/registrations/override/:registration_id/status
+            delay(1000) // Simulasi loading network
+
+            // Update state lokal untuk mencerminkan perubahan
             val updatedList = _uiState.value.participants.map {
                 if (it.registrationId == registrationId) it.copy(status = newStatus) else it
             }
-            _uiState.update { it.copy(participants = updatedList) }
+
+            // Tutup dialog dan matikan loading setelah sukses
+            _uiState.update {
+                it.copy(
+                    participants = updatedList,
+                    isOverrideLoading = false,
+                    selectedParticipant = null // Menutup dialog
+                )
+            }
         }
     }
 }
