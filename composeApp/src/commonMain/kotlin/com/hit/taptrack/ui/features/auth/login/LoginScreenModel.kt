@@ -2,8 +2,10 @@ package com.hit.taptrack.ui.features.auth.login
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.auth.login.states.LoginEvent
 import com.hit.taptrack.ui.features.auth.login.states.LoginUiState
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,10 +13,26 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LoginScreenModel : ScreenModel {
+class LoginScreenModel(
+    private val tapTrackRepository: TapTrackRepository
+) : ScreenModel {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    init {
+        getHealth()
+    }
+
+    fun getHealth() {
+        screenModelScope.launch {
+            // get api response
+            val healthResponse = tapTrackRepository.getHealth()
+
+            // print to log
+            Napier.d("Health Response: $healthResponse" )
+        }
+    }
 
     fun onEvent(event: LoginEvent) {
         when (event) {

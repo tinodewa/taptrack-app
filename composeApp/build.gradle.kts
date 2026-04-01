@@ -45,7 +45,7 @@ kotlin {
 
     androidTarget {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
@@ -103,6 +103,9 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
 
+            // 3. Ktor Engine (CIO works on both Android & Desktop)
+            implementation(libs.ktor.client.cio)
+
             // Napier for Logging
             implementation(libs.napier)
 
@@ -130,9 +133,6 @@ kotlin {
             // Room dependencies
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.room.ktx)
-
-            // 3. Ktor Engine (CIO works on both Android & Desktop)
-            implementation(libs.ktor.client.cio)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -143,9 +143,6 @@ kotlin {
 
             // Kotlinx datetime
             implementation(libs.kotlinx.datetime)
-
-            // 3. Ktor Engine (CIO works on both Android & Desktop)
-            implementation(libs.ktor.client.cio)
         }
     }
 }
@@ -172,8 +169,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
