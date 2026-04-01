@@ -2,7 +2,9 @@ package com.hit.taptrack.ui.features.auth.login
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.repositories.TapTrackRepository
+import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
 import com.hit.taptrack.ui.features.auth.login.states.LoginEvent
 import com.hit.taptrack.ui.features.auth.login.states.LoginUiState
 import io.github.aakira.napier.Napier
@@ -30,7 +32,7 @@ class LoginScreenModel(
             val healthResponse = tapTrackRepository.getHealth()
 
             // print to log
-            Napier.d("Health Response: $healthResponse" )
+            Napier.d("Health Response: $healthResponse")
         }
     }
 
@@ -57,7 +59,6 @@ class LoginScreenModel(
         val currentEmail = _uiState.value.email
         val currentPassword = _uiState.value.password
 
-        // Validasi input sederhana
         if (currentEmail.isBlank() || currentPassword.isBlank()) {
             _uiState.update { it.copy(errorMessage = "Email dan Password tidak boleh kosong") }
             return
@@ -66,23 +67,27 @@ class LoginScreenModel(
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
         screenModelScope.launch {
-            try {
-                // TODO: Ganti dengan pemanggilan fungsi repository / API POST /api/v1/auth/login
-                // val response = authRepository.login(currentEmail, currentPassword)
+            val request = AuthRequest(email = currentEmail, password = currentPassword)
 
-                // Simulasi delay jaringan sementara API belum tersambung
-                delay(1500)
+            // Panggil fungsi login di repository
+            val result = tapTrackRepository.login(request)
 
-                // Jika sukses:
-                _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
+            // Gunakan 'when' untuk menangani ResultState buatanmu
+            when (result) {
+                is ResultState.Success -> {
+                    // Login Sukses!
+                    _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
+                }
 
-            } catch (e: Exception) {
-                // Jika gagal:
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Terjadi kesalahan saat login"
-                    )
+                is ResultState.Error -> {
+                    // Login Gagal! (Entah karena 401, timeout, dsb)
+                    // Asumsi ResultState.Error memiliki properti 'message' dan 'statusCode'
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
+                    }
                 }
             }
         }
