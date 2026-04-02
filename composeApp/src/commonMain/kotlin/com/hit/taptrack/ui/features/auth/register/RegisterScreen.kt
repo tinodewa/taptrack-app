@@ -17,6 +17,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.auth.register.states.RegisterEvent
+import com.hit.taptrack.ui.features.eventDiscovery.EventDiscoveryScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 
 class RegisterScreen : Screen {
@@ -30,9 +31,10 @@ class RegisterScreen : Screen {
         // Efek Sukses
         LaunchedEffect(uiState.isRegisterSuccess) {
             if (uiState.isRegisterSuccess) {
-                // Tampilkan snackbar lalu kembali ke Login
-                snackbarHostState.showSnackbar("Registrasi berhasil! Silakan Login.")
-                navigator.pop()
+                // Tampilkan snackbar sebelum navigasi
+                snackbarHostState.showSnackbar("Registrasi berhasil!")
+                // Karena sudah di-login-kan otomatis oleh Repo, langsung tembak ke Event Discovery!
+                navigator.replaceAll(EventDiscoveryScreen())
             }
         }
 

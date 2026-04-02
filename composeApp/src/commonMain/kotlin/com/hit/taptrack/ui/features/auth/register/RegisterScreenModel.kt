@@ -2,6 +2,10 @@ package com.hit.taptrack.ui.features.auth.register
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.repositories.TapTrackRepository
+import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
+import com.hit.taptrack.data.sources.remote.requestBody.UpdateProfileRequest
 import com.hit.taptrack.ui.features.auth.register.states.RegisterEvent
 import com.hit.taptrack.ui.features.auth.register.states.RegisterUiState
 import kotlinx.coroutines.delay
@@ -11,7 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RegisterScreenModel : ScreenModel {
+class RegisterScreenModel(
+    private val tapTrackRepository: TapTrackRepository
+) : ScreenModel {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
@@ -32,28 +38,31 @@ class RegisterScreenModel : ScreenModel {
     private fun performRegister() {
         val state = _uiState.value
 
-        // Validasi Form
-        if (state.fullName.isBlank() || state.email.isBlank() || state.password.isBlank() ||
-            state.bloodType.isBlank() || state.emergencyContact.isBlank()
-        ) {
-            _uiState.update { it.copy(errorMessage = "Mohon lengkapi semua data wajib") }
+        // Validasi input
+        if (state.email.isBlank() || state.password.isBlank() || state.fullName.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Nama, Email, dan Password wajib diisi.") }
             return
         }
 
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
         screenModelScope.launch {
-            try {
-                // TODO: Eksekusi API POST /api/v1/auth/register di sini
-                delay(1500) // Simulasi loading
+            val registerReq = AuthRequest(email = state.email, password = state.password)
+            val profileReq = UpdateProfileRequest(
+                fullName = state.fullName,
+                bloodType = state.bloodType,
+                emergencyContact = state.emergencyContact,
+                vehicleClass = state.vehicle
+            )
 
-                _uiState.update { it.copy(isLoading = false, isRegisterSuccess = true) }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Gagal melakukan registrasi"
-                    )
+            val result = tapTrackRepository.registerAndSetupProfile(registerReq, profileReq)
+
+            when (result) {
+                is ResultState.Success -> {
+                    _uiState.update { it.copy(isLoading = false, isRegisterSuccess = true) }
+                }
+                is ResultState.Error -> {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
                 }
             }
         }

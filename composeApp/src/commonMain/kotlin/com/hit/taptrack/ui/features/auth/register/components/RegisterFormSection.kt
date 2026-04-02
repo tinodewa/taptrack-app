@@ -171,7 +171,7 @@ fun RegisterFormSection(
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             } else {
-                Text("DAFTAR", style = MaterialTheme.typography.labelLarge)
+                Text("DAFTAR & MASUK", style = MaterialTheme.typography.labelLarge)
             }
         }
     }
