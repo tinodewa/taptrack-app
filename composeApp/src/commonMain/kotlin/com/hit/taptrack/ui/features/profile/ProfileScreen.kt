@@ -17,6 +17,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.auth.login.LoginScreen
+import com.hit.taptrack.ui.features.initial.landing.LandingScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 
 class ProfileScreen : Screen {
@@ -29,9 +30,8 @@ class ProfileScreen : Screen {
         // Handle Logout Side Effect
         LaunchedEffect(uiState.isLoggedOut) {
             if (uiState.isLoggedOut) {
-                // Gunakan replaceAll agar seluruh tumpukan navigasi dihapus
-                // dan user tidak bisa menekan tombol back untuk masuk lagi
-                navigator.replaceAll(LoginScreen())
+                // Gunakan replaceAll dan arahkan ke LandingScreen sesuai alur terbaru kita
+                navigator.replaceAll(LandingScreen())
             }
         }
 

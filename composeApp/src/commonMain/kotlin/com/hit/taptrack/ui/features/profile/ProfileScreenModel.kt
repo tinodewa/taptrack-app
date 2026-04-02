@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.data.model.UserProfileModel
 import com.hit.taptrack.ui.features.profile.states.ProfileEvent
 import com.hit.taptrack.ui.features.profile.states.ProfileUiState
+import com.hit.taptrack.utils.helpers.UserSettings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ProfileScreenModel : ScreenModel {
+class ProfileScreenModel(
+    private val userSettings: UserSettings
+) : ScreenModel {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -41,7 +44,8 @@ class ProfileScreenModel : ScreenModel {
                 bloodType = "O",
                 emergencyContact = "08123456789 (Istri)",
                 vehicle = "Yamaha YZ250F",
-                role = "RACER"
+                // Ambil role yang sebenarnya dari local storage untuk simulasi UI yang lebih nyata
+                role = userSettings.getRole()
             )
 
             _uiState.update { it.copy(isLoading = false, profile = dummyProfile) }
@@ -51,10 +55,14 @@ class ProfileScreenModel : ScreenModel {
     private fun processLogout() {
         screenModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            delay(500) // Simulasi proses penghapusan token
 
-            // TODO: Hapus JWT Token dari Multiplatform Settings (misal: settings.remove("JWT_TOKEN"))
+            // 1. Eksekusi penghapusan Token JWT, Role, dan Profile ID
+            userSettings.clearAuthData()
 
+            // 2. Simulasi proses agar animasi loading terlihat natural
+            delay(500)
+
+            // 3. Ubah state untuk memicu LaunchedEffect di UI
             _uiState.update { it.copy(isLoading = false, isLoggedOut = true) }
         }
     }

@@ -19,24 +19,31 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.eventDiscovery.EventDiscoveryScreen
 import com.hit.taptrack.ui.features.initial.landing.LandingScreen
+import com.hit.taptrack.utils.helpers.UserSettings
 import kotlinx.coroutines.delay
+import org.koin.compose.koinInject
 
 class SplashScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        // Simulasi Pengecekan Data (SharedPrefs / Room / Koneksi)
+        // 1. Suntikkan UserSettings menggunakan Koin
+        val userSettings: UserSettings = koinInject()
+
+        // 2. Logika Pengecekan Kredensial di Background
         LaunchedEffect(Unit) {
-            delay(2000) // Simulasi waktu proses 2 detik
+            // Beri sedikit delay agar logo aplikasi sempat terlihat oleh pengguna (branding)
+            // Di dunia nyata, delay ini bisa dihapus jika tidak diperlukan
+            delay(1500)
 
-            // TODO: Ganti dengan logika pengecekan token JWT sesungguhnya
-            val isUserLoggedIn = false
-
-            if (isUserLoggedIn) {
-                // Gunakan replaceAll agar pengguna tidak bisa "back" ke Splash Screen
+            // Cek apakah pengguna sudah memiliki token JWT yang tersimpan
+            if (userSettings.isLoggedIn()) {
+                // Jika sudah login, langsung buang Splash Screen dan masuk ke aplikasi utama
+                // (Ganti dengan nama Screen utama kamu, misal EventDiscoveryScreen atau HomeScreen)
                 navigator.replaceAll(EventDiscoveryScreen())
             } else {
+                // Jika belum login (atau baru pertama instal), arahkan ke Landing Page
                 navigator.replaceAll(LandingScreen())
             }
         }
