@@ -1,6 +1,7 @@
 package com.hit.taptrack.di
 
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
+import com.hit.taptrack.utils.helpers.UserSettings
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.converter.ResponseConverterFactory
 import io.ktor.client.HttpClient
@@ -15,6 +16,9 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
+import io.ktor.http.encodedPath
 
 /**
  * Dependency injection module for Ktorfit and network-related components.
@@ -28,6 +32,9 @@ val ktorfitModule = module {
 
     // Ktor HttpClient
     single {
+        // 1. Ambil UserSettings dari Koin
+        val userSettings = get<UserSettings>()
+
         HttpClient(CIO) {
             // JSON Configuration
             install(ContentNegotiation) {
@@ -40,9 +47,23 @@ val ktorfitModule = module {
                 )
             }
 
-            // Set Default Content-Type to JSON
+            // Set Default Headers & Token Injection
             defaultRequest {
+                // Set Default Content-Type to JSON
                 contentType(ContentType.Application.Json)
+
+                // 2. Ambil token saat request dibuat
+                val token = userSettings.getToken()
+                val currentUrlPath = url.encodedPath
+
+                // 3. Logika Pengecualian:
+                // Jika token ada DAN endpoint BUKAN login/register, sisipkan token
+                if (!token.isNullOrBlank() &&
+                    !currentUrlPath.contains("auth/login") &&
+                    !currentUrlPath.contains("auth/register")
+                ) {
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                }
             }
 
             // --- ADD THIS BLOCK ---
