@@ -3,7 +3,9 @@ package com.hit.taptrack.data.repositories
 import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
 import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
+import com.hit.taptrack.data.sources.remote.requestBody.ChangeParticipantStatusRequest
 import com.hit.taptrack.data.sources.remote.requestBody.EventRegistrationRequest
+import com.hit.taptrack.data.sources.remote.requestBody.ScanQrRequest
 import com.hit.taptrack.data.sources.remote.requestBody.UpdateProfileRequest
 import com.hit.taptrack.data.sources.remote.responseBody.EventDetail
 import com.hit.taptrack.data.sources.remote.responseBody.EventRegisterResponse
@@ -11,6 +13,8 @@ import com.hit.taptrack.data.sources.remote.responseBody.Events
 import com.hit.taptrack.data.sources.remote.responseBody.EventsParticipation
 import com.hit.taptrack.data.sources.remote.responseBody.EventsResponse
 import com.hit.taptrack.data.sources.remote.responseBody.LoginResponse
+import com.hit.taptrack.data.sources.remote.responseBody.OverrideParticipantStatusResponse
+import com.hit.taptrack.data.sources.remote.responseBody.ScanQrResponse
 import com.hit.taptrack.data.sources.remote.responseBody.TestApiResponse
 import com.hit.taptrack.utils.helpers.UserSettings
 import com.hit.taptrack.utils.helpers.handleApiCall
@@ -204,6 +208,25 @@ class TapTrackRepository(
                     ResultState.Error(result.statusCode, result.message)
                 }
             }
+        }
+    }
+
+    suspend fun scanQr(request: ScanQrRequest): ResultState<ScanQrResponse> {
+        return withContext(ioDispatcher) {
+            handleApiCall(
+                apiCall = { tapTrackApi.scanQr(request) },
+                tag = "Repo_ScanQr"
+            )
+        }
+    }
+
+    suspend fun overrideParticipantStatus(registrationId: String, status: String): ResultState<OverrideParticipantStatusResponse> {
+        return withContext(ioDispatcher) {
+            val request = ChangeParticipantStatusRequest(status = status)
+            handleApiCall(
+                apiCall = { tapTrackApi.overrideParticipantStatus(registrationId, request) },
+                tag = "Repo_OverrideStatus"
+            )
         }
     }
 }

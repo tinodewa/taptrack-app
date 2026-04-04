@@ -4,7 +4,9 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.common.state.ParticipantStatus
+import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.model.ParticipantModel
+import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.eventManage.states.EventManageEvent
 import com.hit.taptrack.ui.features.eventManage.states.EventManageUiState
 import kotlinx.coroutines.delay
@@ -14,7 +16,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class EventManageScreenModel(private val eventId: String) : ScreenModel {
+class EventManageScreenModel(
+    private val eventId: String,
+    private val tapTrackRepository: TapTrackRepository
+) : ScreenModel {
 
     private val _uiState = MutableStateFlow(EventManageUiState(eventId = eventId))
     val uiState: StateFlow<EventManageUiState> = _uiState.asStateFlow()
@@ -76,21 +81,21 @@ class EventManageScreenModel(private val eventId: String) : ScreenModel {
         screenModelScope.launch {
             _uiState.update { it.copy(isOverrideLoading = true) }
 
-            // TODO: Integrasi dengan PUT /api/v1/registrations/override/:registration_id/status
-            delay(1000) // Simulasi loading network
+            // Panggil dari Repository!
+            val result = tapTrackRepository.overrideParticipantStatus(registrationId, newStatus.name)
 
-            // Update state lokal untuk mencerminkan perubahan
-            val updatedList = _uiState.value.participants.map {
-                if (it.registrationId == registrationId) it.copy(status = newStatus) else it
-            }
-
-            // Tutup dialog dan matikan loading setelah sukses
-            _uiState.update {
-                it.copy(
-                    participants = updatedList,
-                    isOverrideLoading = false,
-                    selectedParticipant = null // Menutup dialog
-                )
+            when (result) {
+                is ResultState.Success -> {
+                    // Update list dan tutup dialog
+                    val updatedList = _uiState.value.participants.map {
+                        if (it.registrationId == registrationId) it.copy(status = newStatus) else it
+                    }
+                    _uiState.update { it.copy(participants = updatedList, isOverrideLoading = false, selectedParticipant = null) }
+                }
+                is ResultState.Error -> {
+                    // Tangani error, misal tampilkan lewat errorMessage
+                    _uiState.update { it.copy(isOverrideLoading = false, errorMessage = result.message) }
+                }
             }
         }
     }

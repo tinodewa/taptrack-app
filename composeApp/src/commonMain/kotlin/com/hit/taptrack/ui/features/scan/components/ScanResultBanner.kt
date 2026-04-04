@@ -55,10 +55,16 @@ fun ScanResultBanner(result: ScanResult, onDismiss: () -> Unit) {
                             color = Color.White.copy(alpha = 0.8f)
                         )
                         Text(
-                            "#${result.racerNumber} - ${result.racerName}",
+                            result.message,
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
                             color = Color.White
                         )
+                        // Akan kita tambahkan response racrenumber dan racername pada backend nanti
+//                        Text(
+//                            "#${result.racerNumber} - ${result.racerName}",
+//                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
+//                            color = Color.White
+//                        )
                         Text(
                             "Waktu: ${result.time}",
                             style = MaterialTheme.typography.bodyMedium,

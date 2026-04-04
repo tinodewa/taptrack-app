@@ -12,5 +12,5 @@ data class ScanQrRequest(
     @SerialName("absolute_timestamp")
     var absoluteTimestamp: String? = null,
     @SerialName("manual_override_flag")
-    var manualEverrideFlag: String? = null,
+    var manualOverrideFlag: String? = null,
 )
