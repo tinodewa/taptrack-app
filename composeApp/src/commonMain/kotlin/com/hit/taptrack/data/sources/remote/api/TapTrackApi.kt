@@ -57,7 +57,7 @@ interface TapTrackApi {
 
     // Events
     @GET("events")
-    suspend fun getEvents(): Response<List<EventsResponse>>
+    suspend fun getEvents(): Response<EventsResponse>
 
     @GET("events/{event_id}")
     suspend fun getEventDetail(@Path("event_id") eventId: String): Response<EventDetailResponse>

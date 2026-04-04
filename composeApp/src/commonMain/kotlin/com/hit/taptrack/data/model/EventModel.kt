@@ -9,5 +9,5 @@ data class EventModel(
     val date: String,
     val location: String,
     val status: EventStatus,
-    val participantCount: Int
+    val participantCount: Int? = 0
 )

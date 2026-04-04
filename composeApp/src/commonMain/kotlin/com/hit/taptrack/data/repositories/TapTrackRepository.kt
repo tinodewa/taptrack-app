@@ -4,6 +4,7 @@ import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
 import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
 import com.hit.taptrack.data.sources.remote.requestBody.UpdateProfileRequest
+import com.hit.taptrack.data.sources.remote.responseBody.Events
 import com.hit.taptrack.data.sources.remote.responseBody.EventsResponse
 import com.hit.taptrack.data.sources.remote.responseBody.LoginResponse
 import com.hit.taptrack.data.sources.remote.responseBody.TestApiResponse
@@ -121,6 +122,27 @@ class TapTrackRepository(
 
             // JIKA KETIGANYA SUKSES
             ResultState.Success(Unit)
+        }
+    }
+
+    suspend fun getEvents(): ResultState<List<Events>> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.getEvents() },
+                tag = "Repo_GetEvents"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    // Bongkar EventsResponse, ambil array 'data' di dalamnya
+                    // Jika null, kembalikan list kosong sebagai fallback yang aman
+                    val eventsList = result.data.data
+                    ResultState.Success(eventsList)
+                }
+                is ResultState.Error -> {
+                    ResultState.Error(result.statusCode, result.message)
+                }
+            }
         }
     }
 }

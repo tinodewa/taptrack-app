@@ -22,20 +22,6 @@ class LoginScreenModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-    init {
-        getHealth()
-    }
-
-    fun getHealth() {
-        screenModelScope.launch {
-            // get api response
-            val healthResponse = tapTrackRepository.getHealth()
-
-            // print to log
-            Napier.d("Health Response: $healthResponse")
-        }
-    }
-
     fun onEvent(event: LoginEvent) {
         when (event) {
             is LoginEvent.EmailChanged -> {
