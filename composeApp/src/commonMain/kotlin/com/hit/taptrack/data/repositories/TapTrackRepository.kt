@@ -8,6 +8,7 @@ import com.hit.taptrack.data.sources.remote.requestBody.UpdateProfileRequest
 import com.hit.taptrack.data.sources.remote.responseBody.EventDetail
 import com.hit.taptrack.data.sources.remote.responseBody.EventRegisterResponse
 import com.hit.taptrack.data.sources.remote.responseBody.Events
+import com.hit.taptrack.data.sources.remote.responseBody.EventsParticipation
 import com.hit.taptrack.data.sources.remote.responseBody.EventsResponse
 import com.hit.taptrack.data.sources.remote.responseBody.LoginResponse
 import com.hit.taptrack.data.sources.remote.responseBody.TestApiResponse
@@ -183,6 +184,26 @@ class TapTrackRepository(
                 apiCall = { tapTrackApi.joinEvent(request) },
                 tag = "Repo_JoinEvent"
             )
+        }
+    }
+
+    suspend fun getMyTickets(): ResultState<List<EventsParticipation>> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.getRacerDataParticipantOnEvents() },
+                tag = "Repo_GetMyTickets"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    // Ambil array 'data', berikan list kosong jika null
+                    val ticketsList = result.data.data
+                    ResultState.Success(ticketsList)
+                }
+                is ResultState.Error -> {
+                    ResultState.Error(result.statusCode, result.message)
+                }
+            }
         }
     }
 }
