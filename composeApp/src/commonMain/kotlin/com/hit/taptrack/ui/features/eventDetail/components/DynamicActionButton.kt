@@ -34,7 +34,7 @@ fun DynamicActionButton(
                 // Logika Klik: Jika sudah sukses daftar, pergi ke tiket. Jika belum, lakukan JoinEvent.
                 onClick = {
                     if (uiState.isJoinSuccess) onNavigateToTickets()
-                    else onEvent(EventDetailEvent.JoinEvent)
+                    else onEvent(EventDetailEvent.ShowJoinDialog)
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 // Tombol aktif jika loading selesai, event upcoming, ATAU jika sudah sukses daftar

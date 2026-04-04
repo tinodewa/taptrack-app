@@ -7,7 +7,13 @@ data class EventDetailUiState(
     val isLoading: Boolean = true,
     val eventDetail: EventDetailModel? = null,
     val userRole: UserRole = UserRole.RACER, // Default simulasi: Racer
+
+    // --- State Pendaftaran ---
+    val showJoinDialog: Boolean = false,
+    val raceNumberInput: String = "",
     val isJoinLoading: Boolean = false,
     val isJoinSuccess: Boolean = false,
+    val joinSuccessMessage: String? = null,
+
     val errorMessage: String? = null
 )
