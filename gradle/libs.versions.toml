@@ -19,6 +19,7 @@ adaptive = "1.2.0"
 kotlinxCoroutinesCore = "1.10.2"
 ktorfitLib = "2.7.2"
 materialIconsExtended = "1.7.3"
+sqliteBundled = "2.5.0-alpha01"
 sqliteJdbc = "3.51.1.0"
 ksp = "2.3.4"
 koin = "4.1.1"
@@ -75,6 +76,7 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqliteBundled" }
 
 # SQLite JDBC Driver
 adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptive" }

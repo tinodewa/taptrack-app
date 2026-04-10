@@ -31,7 +31,10 @@ class EventDiscoveryScreenModel(
         _uiState.update { it.copy(isCommittee = isCommitteeRole) }
 
         // Ambil data langsung saat layar pertama kali dibuka
-        fetchEvents()
+//        fetchEvents()
+
+        observeLocalEvents()
+        refreshData()
     }
 
     fun onEvent(event: EventDiscoveryEvent) {
@@ -41,51 +44,84 @@ class EventDiscoveryScreenModel(
                 applyFilter()
             }
 
-            EventDiscoveryEvent.RefreshEvents -> fetchEvents()
+            EventDiscoveryEvent.RefreshEvents -> refreshData()
         }
     }
 
-    private fun fetchEvents() {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
+    private fun observeLocalEvents() {
         screenModelScope.launch {
-            val result = tapTrackRepository.getEvents()
-
-            when (result) {
-                is ResultState.Success -> {
-                    // Mapping DTO (Events) menjadi UI Model (EventModel)
-                    val mappedEvents = result.data.map { dto ->
-                        EventModel(
-                            id = dto.id ?: "",
-                            name = dto.title ?: "Acara Tanpa Nama",
-                            date = dto.startDatetime ?: "Tanggal Belum Ditentukan",
-                            location = "Sirkuit TapTrack", // Fallback: API belum mengirim lokasi
-                            status = mapStringToStatus(dto.status)
-                        )
-                    }
-
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            allEvents = mappedEvents
-                        )
-                    }
-
-                    // Jangan lupa aplikasikan filter tab setelah data masuk
-                    applyFilter()
+            tapTrackRepository.eventsFlow.collect { entities ->
+                val mapped = entities.map { entity ->
+                    EventModel(
+                        id = entity.id,
+                        name = entity.title,
+                        date = entity.startDatetime,
+                        location = "Sirkuit TapTrack", // Fallback: API belum mengirim lokasi
+                        status = mapStringToStatus(entity.status)
+                    )
                 }
-
-                is ResultState.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.message
-                        )
-                    }
-                }
+                _uiState.update { it.copy(allEvents = mapped, isLoading = false) }
+                applyFilter()
             }
         }
     }
+
+    fun refreshData() {
+        screenModelScope.launch {
+            // Kita tetap set loading jika DB masih kosong
+            if (_uiState.value.allEvents.isEmpty()) {
+                _uiState.update { it.copy(isLoading = true) }
+            }
+
+            val result = tapTrackRepository.syncEvents()
+
+            if (result is ResultState.Error) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+            }
+        }
+    }
+
+//    private fun fetchEvents() {
+//        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+//
+//        screenModelScope.launch {
+//            val result = tapTrackRepository.getEvents()
+//
+//            when (result) {
+//                is ResultState.Success -> {
+//                    // Mapping DTO (Events) menjadi UI Model (EventModel)
+//                    val mappedEvents = result.data.map { dto ->
+//                        EventModel(
+//                            id = dto.id ?: "",
+//                            name = dto.title ?: "Acara Tanpa Nama",
+//                            date = dto.startDatetime ?: "Tanggal Belum Ditentukan",
+//                            location = "Sirkuit TapTrack", // Fallback: API belum mengirim lokasi
+//                            status = mapStringToStatus(dto.status)
+//                        )
+//                    }
+//
+//                    _uiState.update {
+//                        it.copy(
+//                            isLoading = false,
+//                            allEvents = mappedEvents
+//                        )
+//                    }
+//
+//                    // Jangan lupa aplikasikan filter tab setelah data masuk
+//                    applyFilter()
+//                }
+//
+//                is ResultState.Error -> {
+//                    _uiState.update {
+//                        it.copy(
+//                            isLoading = false,
+//                            errorMessage = result.message
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private fun applyFilter() {
         val currentState = _uiState.value

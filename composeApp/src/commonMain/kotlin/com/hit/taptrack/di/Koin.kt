@@ -11,6 +11,7 @@ fun initKoin(config: KoinAppDeclaration = {}) : KoinApplication = startKoin {
     config.invoke(this)
 
     modules(
+        databaseModule,  // Modul untuk Room
         commonModule,    // Modul umum (ViewModel/ScreenModel)
         ktorfitModule,   // Modul untuk Ktorfit
         platformModule, // <--- Ini modul rahasia yang beda tiap platform

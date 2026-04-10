@@ -61,16 +61,16 @@ kotlin {
     
     jvm()
     
-    js {
-        browser()
-        binaries.executable()
-    }
+//    js {
+//        browser()
+//        binaries.executable()
+//    }
     
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        browser()
+//        binaries.executable()
+//    }
     
     sourceSets {
         commonMain.dependencies {
@@ -120,6 +120,15 @@ kotlin {
             implementation(libs.voyager.bottom.sheet.navigator)
             implementation(libs.voyager.tab.navigator)
 
+            // Room dependencies
+            implementation(libs.androidx.room.runtime)
+
+            // Tambahkan SQLite Bundled (Wajib untuk Room KMP)
+            implementation(libs.androidx.sqlite.bundled)
+
+            // Kotlinx datetime
+            implementation(libs.kotlinx.datetime)
+
             // Multiplatform Settings -> Key-Value Storage
             implementation(libs.multiplatform.settings)
         }
@@ -131,7 +140,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             // Room dependencies
-            implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.room.ktx)
         }
         jvmMain.dependencies {
@@ -176,7 +184,16 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    ksp(libs.androidx.room.compiler)
+//    ksp(libs.androidx.room.compiler)
+
+    // ✅ TAMBAHKAN INI SEBAGAI GANTINYA:
+    // (Jalankan compiler Room di setiap target yang kamu miliki)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspJvm", libs.androidx.room.compiler)
+
+    // Jika blok iosX64, iosArm64, dll aktif di bagian kotlin { ... }, tambahkan juga:
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
 }
 
 compose.desktop {

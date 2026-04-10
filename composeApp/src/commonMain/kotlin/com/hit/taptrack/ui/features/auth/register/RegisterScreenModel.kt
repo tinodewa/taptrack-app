@@ -3,6 +3,7 @@ package com.hit.taptrack.ui.features.auth.register
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.repositories.AuthRepository
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
 import com.hit.taptrack.data.sources.remote.requestBody.UpdateProfileRequest
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegisterScreenModel(
-    private val tapTrackRepository: TapTrackRepository
+    private val authRepository: AuthRepository
 ) : ScreenModel {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -55,7 +56,7 @@ class RegisterScreenModel(
                 vehicleClass = state.vehicle
             )
 
-            val result = tapTrackRepository.registerAndSetupProfile(registerReq, profileReq)
+            val result = authRepository.registerAndSetupProfile(registerReq, profileReq)
 
             when (result) {
                 is ResultState.Success -> {

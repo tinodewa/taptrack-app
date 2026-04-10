@@ -1,5 +1,6 @@
 package com.hit.taptrack.di
 
+import com.hit.taptrack.data.repositories.AuthRepository
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.auth.login.LoginScreenModel
 import com.hit.taptrack.ui.features.auth.register.RegisterScreenModel
@@ -22,7 +23,8 @@ val commonModule = module {
     // Application Settings as a singleton, work like shared preferences
     singleOf(::UserSettings)
 
-    single { TapTrackRepository(get(), get()) }
+    single { TapTrackRepository(get(), get(), get()) }
+    single { AuthRepository(get(), get()) }
 
     factoryOf(::LoginScreenModel)
     factoryOf(::RegisterScreenModel)

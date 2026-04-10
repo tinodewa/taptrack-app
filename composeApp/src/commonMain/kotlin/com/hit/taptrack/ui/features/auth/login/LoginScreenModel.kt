@@ -3,6 +3,7 @@ package com.hit.taptrack.ui.features.auth.login
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.repositories.AuthRepository
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
 import com.hit.taptrack.ui.features.auth.login.states.LoginEvent
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginScreenModel(
-    private val tapTrackRepository: TapTrackRepository
+    private val authRepository: AuthRepository
 ) : ScreenModel {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -56,7 +57,7 @@ class LoginScreenModel(
             val request = AuthRequest(email = currentEmail, password = currentPassword)
 
             // Panggil fungsi login di repository
-            val result = tapTrackRepository.login(request)
+            val result = authRepository.login(request)
 
             // Gunakan 'when' untuk menangani ResultState buatanmu
             when (result) {
