@@ -27,12 +27,12 @@ fun StatusBadge(
             "MENDATANG"
         )
 
-        EventStatus.ONGOING -> Triple(
+        EventStatus.ACTIVE -> Triple(
             Color(0xFFE8F5E9),
             Color(0xFF2E7D32),
             "BERLANGSUNG"
         ) // Hijau untuk "Live"
-        EventStatus.COMPLETED -> Triple(
+        EventStatus.FINISHED -> Triple(
             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
             MaterialTheme.colorScheme.onSurfaceVariant,
             "SELESAI"

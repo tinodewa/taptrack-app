@@ -79,7 +79,7 @@ interface TapTrackApi {
 
     // --- COMMITTEE/ADMIN ---
     // Event Participant
-    @GET("events/{event_id}")
+    @GET("events/{event_id}/participants")
     suspend fun getEventParticipantList(@Path("event_id") eventId: String): Response<EventParticipantListResponse>
 
     // Create Event

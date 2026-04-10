@@ -45,7 +45,7 @@ fun EventStateControllerCard(
             ) {
                 // Tombol Mulai (Hanya aktif jika Upcoming)
                 Button(
-                    onClick = { onEvent(EventManageEvent.ChangeEventStatus(EventStatus.ONGOING)) },
+                    onClick = { onEvent(EventManageEvent.ChangeEventStatus(EventStatus.ACTIVE)) },
                     enabled = !isChanging && currentStatus == EventStatus.UPCOMING,
                     modifier = Modifier.weight(1f).height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
@@ -57,8 +57,8 @@ fun EventStateControllerCard(
 
                 // Tombol Selesai (Hanya aktif jika Ongoing)
                 Button(
-                    onClick = { onEvent(EventManageEvent.ChangeEventStatus(EventStatus.COMPLETED)) },
-                    enabled = !isChanging && currentStatus == EventStatus.ONGOING,
+                    onClick = { onEvent(EventManageEvent.ChangeEventStatus(EventStatus.FINISHED)) },
+                    enabled = !isChanging && currentStatus == EventStatus.ACTIVE,
                     modifier = Modifier.weight(1f).height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
@@ -67,7 +67,7 @@ fun EventStateControllerCard(
                     Text("SELESAIKAN")
                 }
             }
-            if (currentStatus == EventStatus.COMPLETED) {
+            if (currentStatus == EventStatus.FINISHED) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     "Acara telah diselesaikan.",

@@ -139,8 +139,8 @@ class EventDetailScreenModel(
     private fun mapStringToStatus(status: String?): EventStatus {
         return when (status?.uppercase()) {
             "UPCOMING" -> EventStatus.UPCOMING
-            "ONGOING", "LIVE" -> EventStatus.ONGOING
-            "COMPLETED", "FINISHED" -> EventStatus.COMPLETED
+            "ACTIVE", "LIVE" -> EventStatus.ACTIVE
+            "COMPLETED", "FINISHED" -> EventStatus.FINISHED
             else -> EventStatus.UPCOMING
         }
     }

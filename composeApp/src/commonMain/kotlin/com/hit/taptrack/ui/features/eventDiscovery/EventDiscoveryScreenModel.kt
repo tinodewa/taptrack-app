@@ -30,9 +30,6 @@ class EventDiscoveryScreenModel(
             userSettings.getRole() == "COMMITTEE" || userSettings.getRole() == "ADMIN"
         _uiState.update { it.copy(isCommittee = isCommitteeRole) }
 
-        // Ambil data langsung saat layar pertama kali dibuka
-//        fetchEvents()
-
         observeLocalEvents()
         refreshData()
     }
@@ -81,48 +78,6 @@ class EventDiscoveryScreenModel(
         }
     }
 
-//    private fun fetchEvents() {
-//        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-//
-//        screenModelScope.launch {
-//            val result = tapTrackRepository.getEvents()
-//
-//            when (result) {
-//                is ResultState.Success -> {
-//                    // Mapping DTO (Events) menjadi UI Model (EventModel)
-//                    val mappedEvents = result.data.map { dto ->
-//                        EventModel(
-//                            id = dto.id ?: "",
-//                            name = dto.title ?: "Acara Tanpa Nama",
-//                            date = dto.startDatetime ?: "Tanggal Belum Ditentukan",
-//                            location = "Sirkuit TapTrack", // Fallback: API belum mengirim lokasi
-//                            status = mapStringToStatus(dto.status)
-//                        )
-//                    }
-//
-//                    _uiState.update {
-//                        it.copy(
-//                            isLoading = false,
-//                            allEvents = mappedEvents
-//                        )
-//                    }
-//
-//                    // Jangan lupa aplikasikan filter tab setelah data masuk
-//                    applyFilter()
-//                }
-//
-//                is ResultState.Error -> {
-//                    _uiState.update {
-//                        it.copy(
-//                            isLoading = false,
-//                            errorMessage = result.message
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     private fun applyFilter() {
         val currentState = _uiState.value
         val tabIndex = currentState.selectedTabIndex
@@ -131,8 +86,8 @@ class EventDiscoveryScreenModel(
         val filtered = currentState.allEvents.filter { event ->
             when (tabIndex) {
                 0 -> event.status == EventStatus.UPCOMING
-                1 -> event.status == EventStatus.ONGOING
-                2 -> event.status == EventStatus.COMPLETED
+                1 -> event.status == EventStatus.ACTIVE
+                2 -> event.status == EventStatus.FINISHED
                 else -> true
             }
         }
@@ -144,8 +99,8 @@ class EventDiscoveryScreenModel(
     private fun mapStringToStatus(status: String?): EventStatus {
         return when (status?.uppercase()) {
             "UPCOMING" -> EventStatus.UPCOMING
-            "ONGOING", "LIVE" -> EventStatus.ONGOING
-            "COMPLETED", "FINISHED" -> EventStatus.COMPLETED
+            "ONGOING", "LIVE", "ACTIVE" -> EventStatus.ACTIVE
+            "COMPLETED", "FINISHED" -> EventStatus.FINISHED
             else -> EventStatus.UPCOMING // Default aman
         }
     }

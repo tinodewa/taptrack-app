@@ -34,7 +34,7 @@ fun LeaderboardAccessCard(status: EventStatus, onClick: () -> Unit) {
     // Sembunyikan kartu jika acara belum dimulai
     if (status == EventStatus.UPCOMING) return
 
-    val isLive = status == EventStatus.ONGOING
+    val isLive = status == EventStatus.ACTIVE
 
     // Tentukan tema berdasarkan status (Merah untuk Live, Biru/Secondary untuk Selesai)
     val containerColor =

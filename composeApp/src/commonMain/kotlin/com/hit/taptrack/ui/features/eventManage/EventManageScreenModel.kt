@@ -75,10 +75,33 @@ class EventManageScreenModel(
 
     private fun updateEventStatus(newStatus: EventStatus) {
         screenModelScope.launch {
-            _uiState.update { it.copy(isStatusChanging = true) }
-            // TODO: API PUT /api/v1/events/:event_id/status
-            delay(1000)
-            _uiState.update { it.copy(isStatusChanging = false, eventStatus = newStatus) }
+            // Nyalakan indikator loading dan bersihkan error sebelumnya
+            _uiState.update { it.copy(isStatusChanging = true, errorMessage = null) }
+
+            // Panggil Repository! Gunakan nama enum sebagai string (misal: "ACTIVE")
+            val result = tapTrackRepository.updateEventStatus(eventId, newStatus.name)
+
+            when (result) {
+                is ResultState.Success -> {
+                    // Berhasil! Matikan loading dan perbarui UI dengan status baru
+                    _uiState.update {
+                        it.copy(
+                            isStatusChanging = false,
+                            eventStatus = newStatus
+                        )
+                    }
+                }
+
+                is ResultState.Error -> {
+                    // Gagal, matikan loading dan tampilkan pesan error
+                    _uiState.update {
+                        it.copy(
+                            isStatusChanging = false,
+                            errorMessage = result.message
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -87,7 +110,8 @@ class EventManageScreenModel(
             _uiState.update { it.copy(isOverrideLoading = true) }
 
             // Panggil dari Repository!
-            val result = tapTrackRepository.overrideParticipantStatus(registrationId, newStatus.name)
+            val result =
+                tapTrackRepository.overrideParticipantStatus(registrationId, newStatus.name)
 
             when (result) {
                 is ResultState.Success -> {
@@ -95,11 +119,23 @@ class EventManageScreenModel(
                     val updatedList = _uiState.value.participants.map {
                         if (it.registrationId == registrationId) it.copy(status = newStatus) else it
                     }
-                    _uiState.update { it.copy(participants = updatedList, isOverrideLoading = false, selectedParticipant = null) }
+                    _uiState.update {
+                        it.copy(
+                            participants = updatedList,
+                            isOverrideLoading = false,
+                            selectedParticipant = null
+                        )
+                    }
                 }
+
                 is ResultState.Error -> {
                     // Tangani error, misal tampilkan lewat errorMessage
-                    _uiState.update { it.copy(isOverrideLoading = false, errorMessage = result.message) }
+                    _uiState.update {
+                        it.copy(
+                            isOverrideLoading = false,
+                            errorMessage = result.message
+                        )
+                    }
                 }
             }
         }

@@ -10,6 +10,7 @@ import com.hit.taptrack.data.sources.local.entity.ParticipantEntity
 import com.hit.taptrack.data.sources.local.entity.ScanLogEntity
 import com.hit.taptrack.data.sources.local.entity.TicketEntity
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
+import com.hit.taptrack.data.sources.remote.requestBody.ChangeEventStatusRequest
 import com.hit.taptrack.data.sources.remote.requestBody.ChangeParticipantStatusRequest
 import com.hit.taptrack.data.sources.remote.requestBody.EventRegistrationRequest
 import com.hit.taptrack.data.sources.remote.requestBody.ScanQrRequest
@@ -267,6 +268,32 @@ class TapTrackRepository(
                 apiCall = { tapTrackApi.getLeaderboardByEventId(eventId) },
                 tag = "Repo_GetLeaderboard"
             )
+        }
+    }
+
+    suspend fun updateEventStatus(eventId: String, newStatus: String): ResultState<Unit> {
+        return withContext(ioDispatcher) {
+            // 1. Siapkan Request Body
+            val request = ChangeEventStatusRequest(status = newStatus)
+
+            // 2. Tembak API
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.updateEventStatus(eventId, request) },
+                tag = "Repo_UpdateEventStatus"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    // 3. Jika API sukses, ubah juga status di database lokal
+                    // Asumsi: eventDao sudah di-inject ke Repository ini
+                    eventDao.updateEventStatusLocal(eventId, newStatus)
+
+                    ResultState.Success(Unit)
+                }
+                is ResultState.Error -> {
+                    ResultState.Error(result.statusCode, result.message)
+                }
+            }
         }
     }
 

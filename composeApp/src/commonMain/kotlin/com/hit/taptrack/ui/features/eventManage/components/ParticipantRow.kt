@@ -32,7 +32,7 @@ fun ParticipantRow(participant: ParticipantModel, onEvent: (EventManageEvent) ->
         ParticipantStatus.REGISTERED -> Color.Gray
         ParticipantStatus.RACING -> Color(0xFF2E7D32) // Hijau
         ParticipantStatus.FINISHED -> MaterialTheme.colorScheme.secondary
-        ParticipantStatus.DNF, ParticipantStatus.DSQ -> MaterialTheme.colorScheme.error
+        ParticipantStatus.DNF, ParticipantStatus.DSQ, ParticipantStatus.UNKNOWN -> MaterialTheme.colorScheme.error
     }
 
     Card(

@@ -16,4 +16,7 @@ interface EventDao {
 
     @Query("DELETE FROM events")
     suspend fun clearAllEvents()
+
+    @Query("UPDATE events SET status = :newStatus WHERE id = :eventId")
+    suspend fun updateEventStatusLocal(eventId: String, newStatus: String)
 }
