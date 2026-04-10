@@ -293,21 +293,6 @@ class TapTrackRepository(
         }
     }
 
-    // Pastikan UserSettings, EventDao, TicketDao, dan ScanLogDao sudah di-inject
-    suspend fun performSecureLogout() {
-        withContext(ioDispatcher) {
-            // 1. Sapu bersih semua data SQLite secara serentak
-            // Gunakan coroutine launch agar berjalan paralel dan lebih cepat
-            launch { eventDao.clearAllEvents() }
-            launch { ticketDao.clearAllTickets() }
-            launch { scanLogDao.clearAllLogs() }
-
-            // 2. Hapus Token, Role, dan Data Sesi dari K-V Storage (Multiplatform Settings)
-            // (Asumsi kamu memiliki fungsi clear() atau clearAuthData() di class UserSettings)
-            userSettings.clearAuthData()
-        }
-    }
-
     suspend fun overrideParticipantStatus(
         registrationId: String,
         status: String

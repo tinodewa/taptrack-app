@@ -2,10 +2,13 @@ package com.hit.taptrack.data.repositories
 
 import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.sources.local.dao.EventDao
+import com.hit.taptrack.data.sources.local.dao.ScanLogDao
+import com.hit.taptrack.data.sources.local.dao.TicketDao
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
 import com.hit.taptrack.data.sources.remote.requestBody.AuthRequest
 import com.hit.taptrack.data.sources.remote.requestBody.UpdateProfileRequest
 import com.hit.taptrack.data.sources.remote.responseBody.LoginResponse
+import com.hit.taptrack.data.sources.remote.responseBody.Profile
 import com.hit.taptrack.utils.helpers.UserSettings
 import com.hit.taptrack.utils.helpers.handleApiCall
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,6 +21,9 @@ import kotlinx.coroutines.withContext
 class AuthRepository(
     private val tapTrackApi: TapTrackApi,
     private val userSettings: UserSettings,
+    private val eventDao: EventDao,
+    private val ticketDao: TicketDao,
+    private val scanLogDao: ScanLogDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
     suspend fun login(request: AuthRequest): ResultState<LoginResponse> {
@@ -122,6 +128,44 @@ class AuthRepository(
 
             // JIKA KETIGANYA SUKSES
             ResultState.Success(Unit)
+        }
+    }
+
+    suspend fun getProfile(): ResultState<Profile> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.getProfile() },
+                tag = "Repo_GetProfile"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    val profileData = result.data.data
+                    if (profileData != null) {
+                        ResultState.Success(profileData)
+                    } else {
+                        ResultState.Error(404, "Data profil tidak ditemukan.")
+                    }
+                }
+                is ResultState.Error -> {
+                    ResultState.Error(result.statusCode, result.message)
+                }
+            }
+        }
+    }
+
+    // Pastikan UserSettings, EventDao, TicketDao, dan ScanLogDao sudah di-inject
+    suspend fun performSecureLogout() {
+        withContext(ioDispatcher) {
+            // 1. Sapu bersih semua data SQLite secara serentak
+            // Gunakan coroutine launch agar berjalan paralel dan lebih cepat
+            launch { eventDao.clearAllEvents() }
+            launch { ticketDao.clearAllTickets() }
+            launch { scanLogDao.clearAllLogs() }
+
+            // 2. Hapus Token, Role, dan Data Sesi dari K-V Storage (Multiplatform Settings)
+            // (Asumsi kamu memiliki fungsi clear() atau clearAuthData() di class UserSettings)
+            userSettings.clearAuthData()
         }
     }
 }

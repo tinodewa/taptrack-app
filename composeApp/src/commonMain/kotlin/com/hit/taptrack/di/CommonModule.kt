@@ -23,8 +23,8 @@ val commonModule = module {
     // Application Settings as a singleton, work like shared preferences
     singleOf(::UserSettings)
 
-    single { TapTrackRepository(get(), get(), get(), get()) }
-    single { AuthRepository(get(), get()) }
+    single { TapTrackRepository(get(), get(), get(), get(), get()) }
+    single { AuthRepository(get(), get(), get(), get(), get()) }
 
     factoryOf(::LoginScreenModel)
     factoryOf(::RegisterScreenModel)

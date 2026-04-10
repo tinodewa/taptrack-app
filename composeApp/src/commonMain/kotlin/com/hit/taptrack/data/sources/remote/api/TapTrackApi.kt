@@ -22,6 +22,7 @@ import com.hit.taptrack.data.sources.remote.responseBody.RegisterResponse
 import com.hit.taptrack.data.sources.remote.responseBody.ScanQrResponse
 import com.hit.taptrack.data.sources.remote.responseBody.SingleEventParticipantResponse
 import com.hit.taptrack.data.sources.remote.responseBody.TestApiResponse
+import com.hit.taptrack.data.sources.remote.responseBody.UpdateProfileResponse
 import de.jensklingenberg.ktorfit.Response
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
@@ -46,10 +47,10 @@ interface TapTrackApi {
 
     // Profile
     @GET("profile")
-    suspend fun getProfile(@Body request: AuthRequest): Response<ProfileResponse>
+    suspend fun getProfile(): Response<ProfileResponse>
 
     @POST("profile")
-    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<LoginResponse>
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<UpdateProfileResponse>
 
     // Leaderboard
     @GET("events/{event_id}/leaderboard")

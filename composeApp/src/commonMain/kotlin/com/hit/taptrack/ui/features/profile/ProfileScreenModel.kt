@@ -2,7 +2,9 @@ package com.hit.taptrack.ui.features.profile
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.model.UserProfileModel
+import com.hit.taptrack.data.repositories.AuthRepository
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.profile.states.ProfileEvent
 import com.hit.taptrack.ui.features.profile.states.ProfileUiState
@@ -16,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class ProfileScreenModel(
     private val userSettings: UserSettings,
-    private val tapTrackRepository: TapTrackRepository
+    private val authRepository: AuthRepository
 ) : ScreenModel {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -35,22 +37,36 @@ class ProfileScreenModel(
 
     private fun loadProfile() {
         screenModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            // TODO: Simulasi ambil data profil (GET /api/v1/users/me) atau dari Multiplatform Settings
-            delay(800)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val dummyProfile = UserProfileModel(
-                licenseId = "T-RACER-2026-X99",
-                fullName = "Andi Gilang",
-                email = "andi.racer@taptrack.com",
-                bloodType = "O",
-                emergencyContact = "08123456789 (Istri)",
-                vehicle = "Yamaha YZ250F",
-                // Ambil role yang sebenarnya dari local storage untuk simulasi UI yang lebih nyata
-                role = userSettings.getRole()
-            )
+            // Panggil API dari Repository
+            val result = authRepository.getProfile()
 
-            _uiState.update { it.copy(isLoading = false, profile = dummyProfile) }
+            when (result) {
+                is ResultState.Success -> {
+                    val dto = result.data
+
+                    // Mapping dari data API (Profile) ke data UI (UserProfileModel)
+                    val actualProfile = UserProfileModel(
+                        licenseId = dto.id ?: "T-RACER-UNKNOWN", // Fallback jika ID null
+                        fullName = dto.fullName ?: "Pembalap Tanpa Nama",
+                        email = "Email disembunyikan", // API saat ini tidak mengirimkan email
+                        bloodType = dto.bloodType ?: "-",
+                        emergencyContact = dto.emergencyContact ?: "-",
+                        vehicle = dto.vehicleClass ?: "Belum diisi",
+                        role = userSettings.getRole()
+                    )
+
+                    _uiState.update {
+                        it.copy(isLoading = false, profile = actualProfile)
+                    }
+                }
+                is ResultState.Error -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = result.message)
+                    }
+                }
+            }
         }
     }
 
@@ -61,7 +77,7 @@ class ProfileScreenModel(
             // 1. Eksekusi pembersihan total!
             // Fungsi ini (yang kita buat sebelumnya) akan menghapus token di UserSettings
             // sekaligus membersihkan tabel Events, Tickets, dan ScanLogs di SQLite.
-            tapTrackRepository.performSecureLogout()
+            authRepository.performSecureLogout()
 
             // 2. Beri jeda sedikit agar animasi loading terasa natural dan memberi waktu proses I/O selesai
             delay(500)
