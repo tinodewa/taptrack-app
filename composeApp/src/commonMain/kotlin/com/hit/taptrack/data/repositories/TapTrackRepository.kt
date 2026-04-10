@@ -259,6 +259,39 @@ class TapTrackRepository(
         }
     }
 
+    suspend fun syncPendingScans(): ResultState<Int> {
+        return withContext(ioDispatcher) {
+            // 1. Ambil semua log yang masih PENDING
+            val pendingLogs = scanLogDao.getPendingScans()
+            if (pendingLogs.isEmpty()) return@withContext ResultState.Success(0)
+
+            var successCount = 0
+
+            // 2. Iterasi dan kirim ke server
+            pendingLogs.forEach { log ->
+                val request = ScanQrRequest(
+                    qrTokenHash = log.qrTokenHash,
+                    checkpointId = log.checkpointId,
+                    absoluteTimestamp = log.absoluteTimestamp,
+                    manualOverrideFlag = log.manualOverrideFlag
+                )
+
+                val result = handleApiCall(
+                    apiCall = { tapTrackApi.scanQr(request) },
+                    tag = "Repo_Sync_Batch"
+                )
+
+                if (result is ResultState.Success) {
+                    // Update status di lokal agar tidak dikirim ulang
+                    scanLogDao.updateSyncStatus(log.localLogId, "SYNCED")
+                    successCount++
+                }
+            }
+
+            ResultState.Success(successCount)
+        }
+    }
+
     suspend fun overrideParticipantStatus(
         registrationId: String,
         status: String

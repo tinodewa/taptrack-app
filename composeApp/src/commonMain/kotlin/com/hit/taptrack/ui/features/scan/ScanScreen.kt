@@ -6,8 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,10 +38,36 @@ data class ScanScreen(val eventId: String) : Screen {
         val screenModel = koinScreenModel<ScanScreenModel> { parametersOf(eventId) }
         val uiState by screenModel.uiState.collectAsStateWithLifecycle()
 
-        RmsScaffold(backgroundColor = MaterialTheme.colorScheme.background) { innerPadding ->
+        RmsScaffold(
+            backgroundColor = MaterialTheme.colorScheme.background,
+
+        ) { innerPadding ->
             Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                 // Header
-                ScanHeader(onBackClick = { navigator.pop() })
+                ScanHeader(
+                    onBackClick = { navigator.pop() },
+                    actions = {
+                        // Tombol Sync & Badge Antrean
+                        Box {
+                            IconButton(
+                                onClick = { screenModel.onEvent(ScanEvent.SyncPendingScans) },
+                                enabled = !uiState.isLoading // Nonaktifkan saat sedang loading
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CloudUpload,
+                                    contentDescription = "Sinkronisasi Data"
+                                )
+                            }
+
+                            // Tampilkan Badge merah jika ada data pending
+                            if (uiState.pendingSyncCount > 0) {
+                                Badge(modifier = Modifier.align(Alignment.TopEnd)) {
+                                    Text("${uiState.pendingSyncCount}")
+                                }
+                            }
+                        }
+                    }
+                )
 
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                     if (maxWidth < 800.dp) {

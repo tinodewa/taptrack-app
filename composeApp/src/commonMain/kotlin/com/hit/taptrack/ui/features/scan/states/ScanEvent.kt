@@ -8,4 +8,5 @@ sealed class ScanEvent {
     data class ProcessScan(val payload: String) : ScanEvent() // Dipanggil saat kamera berhasil baca QR
     object SubmitManualScan : ScanEvent() // Dipanggil saat panitia ketik manual dan tekan tombol
     object DismissResult : ScanEvent() // Menutup popup/banner hasil pindai
+    object SyncPendingScans : ScanEvent()
 }

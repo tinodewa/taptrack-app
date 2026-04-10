@@ -55,6 +55,7 @@ class ScanScreenModel(
                     manualInput = ""
                 )
             }
+            ScanEvent.SyncPendingScans -> performSync()
         }
     }
 
@@ -99,6 +100,28 @@ class ScanScreenModel(
                             scanResult = ScanResult.Error(result.message)
                         )
                     }
+                }
+            }
+        }
+    }
+
+    private fun performSync() {
+        screenModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val result = tapTrackRepository.syncPendingScans()
+
+            when (result) {
+                is ResultState.Success -> {
+                    val count = result.data
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            scanResult = ScanResult.Success("Berhasil sinkronisasi $count data.", "")
+                        )
+                    }
+                }
+                is ResultState.Error -> {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
                 }
             }
         }

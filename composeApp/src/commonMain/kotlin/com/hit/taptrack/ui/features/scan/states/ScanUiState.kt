@@ -8,5 +8,6 @@ data class ScanUiState(
     val manualInput: String = "",
     val isLoading: Boolean = false,
     val scanResult: ScanResult? = null,
-    val pendingSyncCount: Int = 0
+    val pendingSyncCount: Int = 0,
+    val errorMessage: String? = null
 )
