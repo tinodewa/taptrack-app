@@ -7,5 +7,6 @@ data class ScanUiState(
     val selectedCheckpoint: CheckpointType = CheckpointType.START,
     val manualInput: String = "",
     val isLoading: Boolean = false,
-    val scanResult: ScanResult? = null
+    val scanResult: ScanResult? = null,
+    val pendingSyncCount: Int = 0
 )
