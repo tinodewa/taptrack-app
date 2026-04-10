@@ -23,6 +23,7 @@ import com.hit.taptrack.utils.helpers.handleApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class TapTrackRepository(
@@ -289,6 +290,21 @@ class TapTrackRepository(
             }
 
             ResultState.Success(successCount)
+        }
+    }
+
+    // Pastikan UserSettings, EventDao, TicketDao, dan ScanLogDao sudah di-inject
+    suspend fun performSecureLogout() {
+        withContext(ioDispatcher) {
+            // 1. Sapu bersih semua data SQLite secara serentak
+            // Gunakan coroutine launch agar berjalan paralel dan lebih cepat
+            launch { eventDao.clearAllEvents() }
+            launch { ticketDao.clearAllTickets() }
+            launch { scanLogDao.clearAllLogs() }
+
+            // 2. Hapus Token, Role, dan Data Sesi dari K-V Storage (Multiplatform Settings)
+            // (Asumsi kamu memiliki fungsi clear() atau clearAuthData() di class UserSettings)
+            userSettings.clearAuthData()
         }
     }
 

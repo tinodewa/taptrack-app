@@ -3,6 +3,7 @@ package com.hit.taptrack.ui.features.profile
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.data.model.UserProfileModel
+import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.profile.states.ProfileEvent
 import com.hit.taptrack.ui.features.profile.states.ProfileUiState
 import com.hit.taptrack.utils.helpers.UserSettings
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileScreenModel(
-    private val userSettings: UserSettings
+    private val userSettings: UserSettings,
+    private val tapTrackRepository: TapTrackRepository
 ) : ScreenModel {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -56,10 +58,12 @@ class ProfileScreenModel(
         screenModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            // 1. Eksekusi penghapusan Token JWT, Role, dan Profile ID
-            userSettings.clearAuthData()
+            // 1. Eksekusi pembersihan total!
+            // Fungsi ini (yang kita buat sebelumnya) akan menghapus token di UserSettings
+            // sekaligus membersihkan tabel Events, Tickets, dan ScanLogs di SQLite.
+            tapTrackRepository.performSecureLogout()
 
-            // 2. Simulasi proses agar animasi loading terlihat natural
+            // 2. Beri jeda sedikit agar animasi loading terasa natural dan memberi waktu proses I/O selesai
             delay(500)
 
             // 3. Ubah state untuk memicu LaunchedEffect di UI

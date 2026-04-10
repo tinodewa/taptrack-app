@@ -22,4 +22,7 @@ interface ScanLogDao {
     // Flow agar UI bisa menampilkan "Ada 5 tiket menunggu sinkronisasi" secara real-time
     @Query("SELECT COUNT(*) FROM scan_logs WHERE eventId = :eventId AND syncStatus = 'PENDING'")
     fun getPendingCountFlow(eventId: String): Flow<Int>
+
+    @Query("DELETE FROM scan_logs")
+    suspend fun clearAllLogs()
 }
