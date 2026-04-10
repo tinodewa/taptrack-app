@@ -2,7 +2,9 @@ package com.hit.taptrack.data.repositories
 
 import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.sources.local.dao.EventDao
+import com.hit.taptrack.data.sources.local.dao.TicketDao
 import com.hit.taptrack.data.sources.local.entity.EventEntity
+import com.hit.taptrack.data.sources.local.entity.TicketEntity
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
 import com.hit.taptrack.data.sources.remote.requestBody.ChangeParticipantStatusRequest
 import com.hit.taptrack.data.sources.remote.requestBody.EventRegistrationRequest
@@ -25,10 +27,14 @@ class TapTrackRepository(
     private val tapTrackApi: TapTrackApi,
     private val userSettings: UserSettings,
     private val eventDao: EventDao,
+    private val ticketDao: TicketDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
     // 1. UI akan mengobservasi Flow ini. Setiap ada perubahan di DB, UI otomatis update.
     val eventsFlow: Flow<List<EventEntity>> = eventDao.getAllEvents()
+
+    // 1. Ekspos Flow ke UI
+    val myTicketsFlow: Flow<List<TicketEntity>> = ticketDao.getAllTickets()
 
     // 2. Fungsi untuk sinkronisasi data dari API ke Local DB
     suspend fun syncEvents(): ResultState<Unit> {
@@ -133,6 +139,41 @@ class TapTrackRepository(
                     // Ambil array 'data', berikan list kosong jika null
                     val ticketsList = result.data.data
                     ResultState.Success(ticketsList)
+                }
+                is ResultState.Error -> {
+                    ResultState.Error(result.statusCode, result.message)
+                }
+            }
+        }
+    }
+
+    // 2. Fungsi Sinkronisasi Tiket (API ke Local DB)
+    suspend fun syncMyTickets(): ResultState<Unit> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.getRacerDataParticipantOnEvents() },
+                tag = "Repo_SyncMyTickets"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    val dtoList = result.data.data ?: emptyList()
+
+                    // Map dari API DTO ke SQLite Entity
+                    val entities = dtoList.map { dto ->
+                        TicketEntity(
+                            eventId = dto.eventId ?: "UNKNOWN_ID",
+                            title = dto.title ?: "Acara Tanpa Nama",
+                            startDatetime = dto.startDatetime ?: "TBA",
+                            raceNumber = dto.raceNumber ?: "-",
+                            registrationStatus = dto.registrationStatus ?: "REGISTERED",
+                            qrTokenHash = dto.qrTokenHash ?: ""
+                        )
+                    }
+
+                    // Simpan secara lokal
+                    ticketDao.upsertTickets(entities)
+                    ResultState.Success(Unit)
                 }
                 is ResultState.Error -> {
                     ResultState.Error(result.statusCode, result.message)

@@ -19,4 +19,5 @@ val databaseModule = module {
 
     // 2. Sediakan EventDao agar bisa dipanggil oleh Repository
     single { get<AppDatabase>().eventDao() }
+    single { get<AppDatabase>().ticketDao() }
 }

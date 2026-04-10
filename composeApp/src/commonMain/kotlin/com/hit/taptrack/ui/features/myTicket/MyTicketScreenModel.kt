@@ -22,54 +22,62 @@ class MyTicketsScreenModel(
     val uiState: StateFlow<MyTicketsUiState> = _uiState.asStateFlow()
 
     init {
-        loadTickets()
+        // 1. Awasi perubahan di Database Lokal
+        observeLocalTickets()
+        // 2. Minta pembaruan dari API
+        refreshData()
     }
 
     fun onEvent(event: MyTicketsEvent) {
         when (event) {
             is MyTicketsEvent.SelectTicket -> _uiState.update { it.copy(selectedTicket = event.ticket) }
-            MyTicketsEvent.RefreshTickets -> loadTickets()
+            MyTicketsEvent.RefreshTickets -> refreshData()
         }
     }
 
-    private fun loadTickets() {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
+    private fun observeLocalTickets() {
         screenModelScope.launch {
-            val result = tapTrackRepository.getMyTickets()
-
-            when (result) {
-                is ResultState.Success -> {
-                    // Mapping dari DTO (EventsParticipation) ke Model UI (TicketModel)
-                    val mappedTickets = result.data.map { dto ->
-                        TicketModel(
-                            // Kita gunakan eventId atau hash sebagai pengganti Registration ID jika tidak ada
-                            registrationId = dto.eventId ?: "UNKNOWN",
-                            eventName = dto.title ?: "Acara Tanpa Nama",
-                            date = dto.startDatetime ?: "TBA",
-                            // Fallback karena API tidak mengirim location dan category di endpoint ini
-                            location = "Sirkuit Utama",
-                            category = "Kelas Umum",
-                            racerNumber = dto.raceNumber ?: "-",
-                            qrCodePayload = dto.qrTokenHash ?: "", // Payload krusial untuk Scanner!
-                            status = dto.registrationStatus ?: "REGISTERED"
-                        )
-                    }
-
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            tickets = mappedTickets
-                        )
-                    }
+            tapTrackRepository.myTicketsFlow.collect { entities ->
+                val mappedTickets = entities.map { entity ->
+                    TicketModel(
+                        registrationId = entity.eventId,
+                        eventName = entity.title,
+                        date = entity.startDatetime,
+                        location = "Sirkuit Utama", // Fallback UI
+                        category = "Kelas Umum", // Fallback UI
+                        racerNumber = entity.raceNumber,
+                        qrCodePayload = entity.qrTokenHash,
+                        status = entity.registrationStatus
+                    )
                 }
-                is ResultState.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.message
-                        )
-                    }
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false, // Matikan loading saat data lokal berhasil dibaca
+                        tickets = mappedTickets
+                    )
+                }
+            }
+        }
+    }
+
+    private fun refreshData() {
+        screenModelScope.launch {
+            // Tampilkan loading HANYA jika list tiket masih kosong (belum ada cache)
+            if (_uiState.value.tickets.isEmpty()) {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
+
+            val result = tapTrackRepository.syncMyTickets()
+
+            // Tangani jika terjadi error jaringan saat sinkronisasi
+            if (result is ResultState.Error) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        // Hanya tampilkan pesan error jika data lokal juga kosong
+                        errorMessage = if (_uiState.value.tickets.isEmpty()) result.message else null
+                    )
                 }
             }
         }
