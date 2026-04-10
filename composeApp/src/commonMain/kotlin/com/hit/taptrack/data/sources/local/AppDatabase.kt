@@ -5,22 +5,26 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import com.hit.taptrack.data.sources.local.dao.EventDao
+import com.hit.taptrack.data.sources.local.dao.ParticipantDao
 import com.hit.taptrack.data.sources.local.dao.ScanLogDao
 import com.hit.taptrack.data.sources.local.dao.TicketDao
 import com.hit.taptrack.data.sources.local.entity.EventEntity
+import com.hit.taptrack.data.sources.local.entity.ParticipantEntity
 import com.hit.taptrack.data.sources.local.entity.ScanLogEntity
 import com.hit.taptrack.data.sources.local.entity.TicketEntity
 
 @Database(entities = [
     EventEntity::class,
     TicketEntity::class,
-    ScanLogEntity::class
+    ScanLogEntity::class,
+    ParticipantEntity::class
 ], version = 1)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun eventDao(): EventDao
     abstract fun ticketDao(): TicketDao
     abstract fun scanLogDao(): ScanLogDao
+    abstract fun participantDao(): ParticipantDao
 }
 
 // 2. Tambahkan blok expect object ini di bagian bawah file

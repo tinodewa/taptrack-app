@@ -25,6 +25,7 @@ class EventManageScreenModel(
     val uiState: StateFlow<EventManageUiState> = _uiState.asStateFlow()
 
     init {
+        observeParticipants()
         loadEventData()
     }
 
@@ -40,30 +41,34 @@ class EventManageScreenModel(
         }
     }
 
+    private fun observeParticipants() {
+        screenModelScope.launch {
+            tapTrackRepository.getParticipantsFlow(eventId).collect { entities ->
+                val mapped = entities.map { entity ->
+                    ParticipantModel(
+                        registrationId = entity.registrationId,
+                        racerName = entity.racerName,
+                        racerNumber = entity.raceNumber,
+                        category = entity.vehicleClass,
+                        status = mapStringToParticipantStatus(entity.registrationStatus)
+                    )
+                }
+                _uiState.update { it.copy(participants = mapped, isLoading = false) }
+            }
+        }
+    }
+
     private fun loadEventData() {
         screenModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            delay(1000) // Simulasi GET data event & participants
+            // UI shows loading if DB is empty
+            if (_uiState.value.participants.isEmpty()) {
+                _uiState.update { it.copy(isLoading = true) }
+            }
 
-            val dummyParticipants = listOf(
-                ParticipantModel("REG-001", "Andi Gilang", "99", "FFA", ParticipantStatus.RACING),
-                ParticipantModel("REG-002", "Doni Tata", "27", "FFA", ParticipantStatus.REGISTERED),
-                ParticipantModel(
-                    "REG-003",
-                    "Mario Aji",
-                    "16",
-                    "Bebek 4T",
-                    ParticipantStatus.FINISHED
-                )
-            )
-
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    eventName = "Kejuaraan Daerah Motocross Jatim",
-                    eventStatus = EventStatus.UPCOMING,
-                    participants = dummyParticipants
-                )
+            // Sync from API
+            val result = tapTrackRepository.syncParticipants(eventId)
+            if (result is ResultState.Error) {
+                _uiState.update { it.copy(errorMessage = result.message) }
             }
         }
     }
@@ -97,6 +102,23 @@ class EventManageScreenModel(
                     _uiState.update { it.copy(isOverrideLoading = false, errorMessage = result.message) }
                 }
             }
+        }
+    }
+
+    /**
+     * Fungsi bantu untuk memetakan String dari API/Room DB menjadi Enum.
+     * Menggunakan .uppercase() agar aman dari masalah case-sensitive (misal: "registered" vs "REGISTERED").
+     */
+    fun mapStringToParticipantStatus(status: String?): ParticipantStatus {
+        if (status == null) return ParticipantStatus.UNKNOWN
+
+        return when (status.uppercase().trim()) {
+            "REGISTERED" -> ParticipantStatus.REGISTERED
+            "ON_TRACK", "RACING" -> ParticipantStatus.RACING
+            "FINISHED", "COMPLETED" -> ParticipantStatus.FINISHED
+            "DNF" -> ParticipantStatus.DNF
+            "DSQ", "DISQUALIFIED" -> ParticipantStatus.DSQ
+            else -> ParticipantStatus.UNKNOWN
         }
     }
 }

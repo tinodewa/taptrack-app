@@ -2,9 +2,11 @@ package com.hit.taptrack.data.repositories
 
 import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.data.sources.local.dao.EventDao
+import com.hit.taptrack.data.sources.local.dao.ParticipantDao
 import com.hit.taptrack.data.sources.local.dao.ScanLogDao
 import com.hit.taptrack.data.sources.local.dao.TicketDao
 import com.hit.taptrack.data.sources.local.entity.EventEntity
+import com.hit.taptrack.data.sources.local.entity.ParticipantEntity
 import com.hit.taptrack.data.sources.local.entity.ScanLogEntity
 import com.hit.taptrack.data.sources.local.entity.TicketEntity
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
@@ -32,6 +34,7 @@ class TapTrackRepository(
     private val eventDao: EventDao,
     private val ticketDao: TicketDao,
     private val scanLogDao: ScanLogDao,
+    private val participantDao: ParticipantDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
     // 1. UI akan mengobservasi Flow ini. Setiap ada perubahan di DB, UI otomatis update.
@@ -39,6 +42,10 @@ class TapTrackRepository(
 
     // 1. Ekspos Flow ke UI
     val myTicketsFlow: Flow<List<TicketEntity>> = ticketDao.getAllTickets()
+
+    // Observe participants for a specific event
+    fun getParticipantsFlow(eventId: String): Flow<List<ParticipantEntity>> =
+        participantDao.getParticipantsByEvent(eventId)
 
     // 2. Fungsi untuk sinkronisasi data dari API ke Local DB
     suspend fun syncEvents(): ResultState<Unit> {
@@ -65,28 +72,6 @@ class TapTrackRepository(
                     // Simpan ke Room (Upsert akan mengupdate jika ID sudah ada)
                     eventDao.upsertEvents(entities)
                     ResultState.Success(Unit)
-                }
-
-                is ResultState.Error -> {
-                    ResultState.Error(result.statusCode, result.message)
-                }
-            }
-        }
-    }
-
-    suspend fun getEvents(): ResultState<List<Events>> {
-        return withContext(ioDispatcher) {
-            val result = handleApiCall(
-                apiCall = { tapTrackApi.getEvents() },
-                tag = "Repo_GetEvents"
-            )
-
-            when (result) {
-                is ResultState.Success -> {
-                    // Bongkar EventsResponse, ambil array 'data' di dalamnya
-                    // Jika null, kembalikan list kosong sebagai fallback yang aman
-                    val eventsList = result.data.data
-                    ResultState.Success(eventsList)
                 }
 
                 is ResultState.Error -> {
@@ -135,27 +120,6 @@ class TapTrackRepository(
         }
     }
 
-    suspend fun getMyTickets(): ResultState<List<EventsParticipation>> {
-        return withContext(ioDispatcher) {
-            val result = handleApiCall(
-                apiCall = { tapTrackApi.getRacerDataParticipantOnEvents() },
-                tag = "Repo_GetMyTickets"
-            )
-
-            when (result) {
-                is ResultState.Success -> {
-                    // Ambil array 'data', berikan list kosong jika null
-                    val ticketsList = result.data.data
-                    ResultState.Success(ticketsList)
-                }
-
-                is ResultState.Error -> {
-                    ResultState.Error(result.statusCode, result.message)
-                }
-            }
-        }
-    }
-
     // 2. Fungsi Sinkronisasi Tiket (API ke Local DB)
     suspend fun syncMyTickets(): ResultState<Unit> {
         return withContext(ioDispatcher) {
@@ -189,15 +153,6 @@ class TapTrackRepository(
                     ResultState.Error(result.statusCode, result.message)
                 }
             }
-        }
-    }
-
-    suspend fun scanQr(request: ScanQrRequest): ResultState<ScanQrResponse> {
-        return withContext(ioDispatcher) {
-            handleApiCall(
-                apiCall = { tapTrackApi.scanQr(request) },
-                tag = "Repo_ScanQr"
-            )
         }
     }
 
@@ -312,6 +267,35 @@ class TapTrackRepository(
                 apiCall = { tapTrackApi.getLeaderboardByEventId(eventId) },
                 tag = "Repo_GetLeaderboard"
             )
+        }
+    }
+
+    suspend fun syncParticipants(eventId: String): ResultState<Unit> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.getEventParticipantList(eventId) },
+                tag = "Repo_SyncParticipants"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    val dtoList = result.data.data
+                    val entities = dtoList.map { dto ->
+                        ParticipantEntity(
+                            registrationId = dto.registrationId ?: "",
+                            eventId = eventId,
+                            raceNumber = dto.raceNumber ?: "-",
+                            racerName = dto.racerName ?: "Unknown",
+                            vehicleClass = dto.vehicleClass ?: "-",
+                            registrationStatus = dto.registrationStatus ?: "REGISTERED",
+                            lastCheckpoint = dto.lastCheckpoint
+                        )
+                    }
+                    participantDao.upsertParticipants(entities)
+                    ResultState.Success(Unit)
+                }
+                is ResultState.Error -> ResultState.Error(result.statusCode, result.message)
+            }
         }
     }
 }
