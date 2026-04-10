@@ -141,6 +141,8 @@ kotlin {
 
             // Room dependencies
             implementation(libs.androidx.room.ktx)
+
+            implementation(libs.zxing.android.embedded)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)

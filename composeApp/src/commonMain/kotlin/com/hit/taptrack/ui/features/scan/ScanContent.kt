@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.FlashlightOn
+import androidx.compose.material.icons.filled.NoPhotography
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -36,8 +38,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.hit.taptrack.ui.features.scan.components.CheckpointSelector
+import com.hit.taptrack.ui.features.scan.components.QRScannerView
+import com.hit.taptrack.ui.features.scan.components.RequireCameraPermission
 import com.hit.taptrack.ui.features.scan.states.ScanEvent
 import com.hit.taptrack.ui.features.scan.states.ScanUiState
 
@@ -59,53 +64,89 @@ fun ScanCompact(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Placeholder Kamera
-        Box(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(16.dp))
-                .background(Color.Black), contentAlignment = Alignment.Center
-        ) {
-            // TODO: Ganti Box ini dengan KMP Camera / Scanner Library
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    Icons.Default.CameraAlt,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.5f),
-                    modifier = Modifier.size(64.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Kamera Aktif", color = Color.White.copy(alpha = 0.5f))
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            RequireCameraPermission(
+                onPermissionGranted = {
+                    // ==========================================
+                    // KODE KAMERA ASLI (Yang di dalam Box hitam)
+                    // ==========================================
+                    Box(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.Black),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Panggil QRScannerView dan garis laser di sini
+                        QRScannerView(
+                            modifier = Modifier.fillMaxSize(),
+                            onScan = { payload ->
+                                // NOTE: The camera reads very fast. Ensure your ScreenModel
+                                // ignores duplicate payload requests if `isLoading` is true.
+                                onEvent(ScanEvent.ProcessScan(payload))
+                            }
+                        )
 
-                // Tombol Flashlight (Simulasi)
-                IconButton(
-                    onClick = { /* Toggle Flash */ },
-                    modifier = Modifier.padding(top = 16.dp)
-                        .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(50))
-                ) {
-                    Icon(
-                        Icons.Default.FlashlightOn,
-                        contentDescription = "Senter",
-                        tint = Color.White
-                    )
+                        // 2. Your Custom Viewfinder (Scanner Frame)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(0.7f)
+                                .border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                        )
+
+                        // 3. Your Custom Laser Line
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .height(2.dp)
+                                .background(MaterialTheme.colorScheme.error)
+                        )
+
+                        // Optional: Keep the simulation button around for easy emulator testing
+                        Button(
+                            onClick = { onEvent(ScanEvent.ProcessScan("TAPTRACK-REG-9912A")) },
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(16.dp)
+                        ) {
+                            Text("Simulate QR")
+                        }
+                    }
+                },
+                onPermissionDenied = { requestPermission ->
+                    // ==========================================
+                    // TAMPILAN JIKA IZIN DITOLAK
+                    // ==========================================
+                    Column(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.NoPhotography,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Akses Kamera Dibutuhkan",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = "Kami memerlukan kamera untuk memindai tiket peserta.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 32.dp),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(onClick = requestPermission) {
+                            Text("Berikan Izin")
+                        }
+                    }
                 }
-            }
-
-            // Jendela Bidik (Scanner Frame)
-            Box(
-                modifier = Modifier.fillMaxSize(0.7f)
-                    .border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
             )
-
-            // Garis Laser (Simulasi)
-            Box(
-                modifier = Modifier.fillMaxWidth(0.6f).height(2.dp)
-                    .background(MaterialTheme.colorScheme.error)
-            )
-
-            // Tombol Simulasi Scan Berhasil (UNTUK TESTING)
-            Button(
-                onClick = { onEvent(ScanEvent.ProcessScan("TAPTRACK-REG-9912A")) },
-                modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)
-            ) { Text("Simulasi Scan QR") }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
