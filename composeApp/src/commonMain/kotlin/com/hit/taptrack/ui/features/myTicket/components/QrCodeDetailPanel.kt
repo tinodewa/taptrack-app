@@ -1,5 +1,6 @@
 package com.hit.taptrack.ui.features.myTicket.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.hit.taptrack.data.model.TicketModel
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 
 // --- PANEL DETAIL QR (Bisa dipakai di Dialog Mobile maupun Split View Desktop) ---
 @Composable
@@ -45,18 +47,10 @@ fun QrCodeDetailPanel(ticket: TicketModel, isDialog: Boolean = false) {
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
-            // TODO: Ganti ini dengan library pembuat QR Code (misal: qrose) menggunakan ticket.qrCodePayload
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    Icons.Default.QrCode2,
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp),
-                    tint = Color.Black
-                )
-                Text(
-                    "QR CODE PLACEMENT",
-                    color = Color.Black,
-                    style = MaterialTheme.typography.labelSmall
+                Image(
+                    painter = rememberQrCodePainter(ticket.qrCodePayload),
+                    contentDescription = "QR code referring to the example.com website"
                 )
             }
         }

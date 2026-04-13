@@ -1,5 +1,8 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
+import org.gradle.kotlin.dsl.debugImplementation
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.releaseImplementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -128,6 +131,9 @@ kotlin {
 
             // Kotlinx datetime
             implementation(libs.kotlinx.datetime)
+
+            // QR code generator
+            implementation(libs.qrose)
 
             // Multiplatform Settings -> Key-Value Storage
             implementation(libs.multiplatform.settings)

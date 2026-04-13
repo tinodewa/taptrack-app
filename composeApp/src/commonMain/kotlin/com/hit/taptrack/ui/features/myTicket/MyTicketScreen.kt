@@ -76,7 +76,6 @@ class MyTicketsScreen : Screen {
         // Tampilkan Dialog QR jika ada tiket yang dipilih (Khusus Mobile/Compact)
         if (uiState.selectedTicket != null) {
             QrCodeDialog(
-
                 ticket = uiState.selectedTicket!!,
                 onDismiss = { screenModel.onEvent(MyTicketsEvent.SelectTicket(null)) }
             )

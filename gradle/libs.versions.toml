@@ -19,6 +19,7 @@ adaptive = "1.2.0"
 kotlinxCoroutinesCore = "1.10.2"
 ktorfitLib = "2.7.2"
 materialIconsExtended = "1.7.3"
+qrose = "1.1.2"
 sqliteBundled = "2.5.0-alpha01"
 sqliteJdbc = "3.51.1.0"
 ksp = "2.3.4"
@@ -81,6 +82,7 @@ androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.r
 
 # SQLite JDBC Driver
 adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptive" }
+qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
 
 # Voyager Navigation
