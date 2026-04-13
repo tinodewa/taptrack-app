@@ -135,6 +135,9 @@ kotlin {
             // QR code generator
             implementation(libs.qrose)
 
+            // Inspektify to log api request on app
+            implementation(libs.inspektify.ktor3)
+
             // Multiplatform Settings -> Key-Value Storage
             implementation(libs.multiplatform.settings)
         }

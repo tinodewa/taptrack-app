@@ -19,6 +19,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.http.encodedPath
+import sp.bvantur.inspektify.ktor.InspektifyKtor
 
 /**
  * Dependency injection module for Ktorfit and network-related components.
@@ -66,13 +67,15 @@ val ktorfitModule = module {
                 }
             }
 
+            install(InspektifyKtor)
+
             // --- ADD THIS BLOCK ---
             install(Logging) {
                 // Set the Log Level
                 // ALL = Headers + Body (Like HttpLoggingInterceptor.Level.BODY)
                 // INFO = Url + Method + Status
                 // HEADERS = Headers only
-                level = LogLevel.ALL
+//                level = LogLevel.ALL
 
                 // Configure the Logger
                 // Logger.SIMPLE prints to System.out (works in Logcat & Desktop Console)
