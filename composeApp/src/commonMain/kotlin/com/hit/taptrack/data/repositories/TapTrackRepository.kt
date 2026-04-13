@@ -12,8 +12,10 @@ import com.hit.taptrack.data.sources.local.entity.TicketEntity
 import com.hit.taptrack.data.sources.remote.api.TapTrackApi
 import com.hit.taptrack.data.sources.remote.requestBody.ChangeEventStatusRequest
 import com.hit.taptrack.data.sources.remote.requestBody.ChangeParticipantStatusRequest
+import com.hit.taptrack.data.sources.remote.requestBody.CreateEventRequest
 import com.hit.taptrack.data.sources.remote.requestBody.EventRegistrationRequest
 import com.hit.taptrack.data.sources.remote.requestBody.ScanQrRequest
+import com.hit.taptrack.data.sources.remote.responseBody.CreateEventResponse
 import com.hit.taptrack.data.sources.remote.responseBody.EventDetail
 import com.hit.taptrack.data.sources.remote.responseBody.EventRegisterResponse
 import com.hit.taptrack.data.sources.remote.responseBody.Events
@@ -322,6 +324,37 @@ class TapTrackRepository(
                     ResultState.Success(Unit)
                 }
                 is ResultState.Error -> ResultState.Error(result.statusCode, result.message)
+            }
+        }
+    }
+
+    suspend fun createNewEvent(request: CreateEventRequest): ResultState<CreateEventResponse> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.createEvent(request) },
+                tag = "Repo_CreateEvent"
+            )
+
+            when (result) {
+                is ResultState.Success -> {
+                    // Saat sukses, API biasanya mengembalikan ID Acara yang baru dibuat.
+                    val newEventId = result.data.eventId ?: return@withContext ResultState.Error(500, "ID Acara tidak ditemukan dari server")
+                    val newStatus = result.data.status ?: "UPCOMING"
+
+                    // Langsung masukkan ke Room Database lokal!
+                    val newEntity = EventEntity(
+                        id = newEventId,
+                        title = request.title ?: "Acara Baru",
+                        startDatetime = request.startDatetime ?: "",
+                        status = newStatus
+                    )
+                    eventDao.upsertEvents(listOf(newEntity))
+
+                    ResultState.Success(result.data)
+                }
+                is ResultState.Error -> {
+                    ResultState.Error(result.statusCode, result.message)
+                }
             }
         }
     }

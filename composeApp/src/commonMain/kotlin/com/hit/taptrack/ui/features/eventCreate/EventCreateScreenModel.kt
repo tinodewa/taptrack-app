@@ -2,6 +2,10 @@ package com.hit.taptrack.ui.features.eventCreate
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.repositories.TapTrackRepository
+import com.hit.taptrack.data.sources.remote.requestBody.CreateEventRequest
+import com.hit.taptrack.data.sources.remote.responseBody.CheckpointDetail
 import com.hit.taptrack.ui.features.eventCreate.states.EventCreateEvent
 import com.hit.taptrack.ui.features.eventCreate.states.EventCreateUiState
 import kotlinx.coroutines.delay
@@ -11,7 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class EventCreateScreenModel : ScreenModel {
+class EventCreateScreenModel(
+    private val tapTrackRepository: TapTrackRepository,
+) : ScreenModel {
 
     private val _uiState = MutableStateFlow(EventCreateUiState())
     val uiState: StateFlow<EventCreateUiState> = _uiState.asStateFlow()
@@ -64,16 +70,51 @@ class EventCreateScreenModel : ScreenModel {
 
     private fun submitEvent() {
         val state = _uiState.value
-        if (state.name.isBlank() || state.location.isBlank() || state.date.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Nama, Tanggal, dan Lokasi wajib diisi.") }
+
+        // Validasi Dasar
+        if (state.name.isBlank() || state.date.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Nama dan Tanggal wajib diisi.") }
             return
         }
 
         screenModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            // TODO: Integrasi dengan POST /api/v1/events
-            delay(1500)
-            _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+
+            // 1. Merakit Checkpoints Dinamis
+            val mappedCheckpoints = state.checkpoints.mapIndexed { index, checkpointName ->
+                val flag = when (index) {
+                    0 -> "START" // Elemen paling pertama selalu Start
+                    state.checkpoints.size - 1 -> "FINISH" // Elemen paling akhir selalu Finish
+                    else -> "MIDDLE" // Sisanya di tengah
+                }
+
+                CheckpointDetail(
+                    checkpointName = checkpointName,
+                    typeFlag = flag,
+                    sequenceOrder = index + 1 // Urutan 1, 2, 3...
+                )
+            }
+
+            // 2. Siapkan Request Body untuk Golang
+            val request = CreateEventRequest(
+                title = state.name,
+                startDatetime = state.date,
+                descriptionText = state.description,
+                data = ArrayList(mappedCheckpoints) // Masukkan array checkpoint yang sudah dirakit
+            )
+
+            // 3. Tembak ke Repository
+            val result = tapTrackRepository.createNewEvent(request)
+
+            when (result) {
+                is ResultState.Success -> {
+                    // Berhasil! UI akan membaca isSuccess = true dan menavigasi user kembali
+                    _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                }
+                is ResultState.Error -> {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+                }
+            }
         }
     }
 }
