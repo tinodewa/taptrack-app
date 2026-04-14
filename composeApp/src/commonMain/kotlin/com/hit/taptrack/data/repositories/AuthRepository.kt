@@ -61,7 +61,9 @@ class AuthRepository(
     ): ResultState<Unit> {
         return withContext(ioDispatcher) {
 
+            // ==========================================
             // 1. TEMBAK API REGISTER
+            // ==========================================
             val registerResult = handleApiCall(
                 apiCall = { tapTrackApi.register(registerReq) },
                 tag = "Repo_Register"
@@ -73,8 +75,11 @@ class AuthRepository(
                 )
             }
 
-            // 2. TEMBAK API LOGIN (Untuk mendapatkan Token JWT)
-            val loginResult = handleApiCall(
+            // ==========================================
+            // 2. TEMBAK API LOGIN PERTAMA
+            // (Untuk mendapatkan Token JWT berstatus GUEST)
+            // ==========================================
+            val firstLoginResult = handleApiCall(
                 apiCall = {
                     tapTrackApi.login(
                         AuthRequest(
@@ -83,25 +88,78 @@ class AuthRepository(
                         )
                     )
                 },
-                tag = "Repo_Login_After_Register"
+                tag = "Repo_First_Login"
             )
 
-            when (loginResult) {
+            when (firstLoginResult) {
                 is ResultState.Error -> {
                     return@withContext ResultState.Error(
-                        loginResult.statusCode,
+                        firstLoginResult.statusCode,
                         "Registrasi berhasil, tapi gagal masuk secara otomatis."
                     )
                 }
-
                 is ResultState.Success -> {
-                    val body = loginResult.data
+                    val body = firstLoginResult.data
                     if (body.token.isNullOrBlank()) {
                         return@withContext ResultState.Error(200, "Token tidak valid dari server.")
                     }
 
-                    // SIMPAN TOKEN KE PENYIMPANAN LOKAL
-                    // (Ini krusial agar request Update Profile di bawah bisa berjalan!)
+                    // SIMPAN TOKEN GUEST KE PENYIMPANAN LOKAL
+                    // (Dibutuhkan agar request Update Profile diizinkan oleh server)
+                    userSettings.saveAuthData(
+                        token = body.token!!,
+                        role = body.role ?: "GUEST",
+                        profileId = body.profileId
+                    )
+                }
+            }
+
+            // ==========================================
+            // 3. TEMBAK API UPDATE PROFILE
+            // (Server mengubah status akun menjadi RACER)
+            // ==========================================
+            val profileResult = handleApiCall(
+                apiCall = { tapTrackApi.updateProfile(profileReq) },
+                tag = "Repo_Update_Profile"
+            )
+
+            if (profileResult is ResultState.Error) {
+                return@withContext ResultState.Error(
+                    profileResult.statusCode,
+                    "Akun terbuat, tapi gagal menyimpan data profil: ${profileResult.message}"
+                )
+            }
+
+            // ==========================================
+            // 4. TEMBAK API LOGIN KEDUA (REFRESH SESI)
+            // (Mendapatkan Token JWT baru berstatus RACER)
+            // ==========================================
+            val secondLoginResult = handleApiCall(
+                apiCall = {
+                    tapTrackApi.login(
+                        AuthRequest(
+                            registerReq.email,
+                            registerReq.password
+                        )
+                    )
+                },
+                tag = "Repo_Second_Login"
+            )
+
+            when (secondLoginResult) {
+                is ResultState.Error -> {
+                    return@withContext ResultState.Error(
+                        secondLoginResult.statusCode,
+                        "Profil lengkap, tapi gagal memperbarui sesi masuk. Silakan login ulang."
+                    )
+                }
+                is ResultState.Success -> {
+                    val body = secondLoginResult.data
+                    if (body.token.isNullOrBlank()) {
+                        return@withContext ResultState.Error(200, "Token baru tidak valid dari server.")
+                    }
+
+                    // TIMPA TOKEN LAMA DENGAN TOKEN BARU YANG VALID
                     userSettings.saveAuthData(
                         token = body.token!!,
                         role = body.role ?: "RACER",
@@ -110,23 +168,7 @@ class AuthRepository(
                 }
             }
 
-            // 3. TEMBAK API UPDATE PROFILE
-            val profileResult = handleApiCall(
-                apiCall = { tapTrackApi.updateProfile(profileReq) },
-                tag = "Repo_Update_Profile"
-            )
-
-            if (profileResult is ResultState.Error) {
-                // Jika gagal update profil, token sudah telanjur tersimpan.
-                // Kamu bisa memilih menghapus token lagi (rollback) atau membiarkannya.
-                // Di sini kita biarkan masuk, tapi beri tahu gagal update profil.
-                return@withContext ResultState.Error(
-                    profileResult.statusCode,
-                    "Akun terbuat, tapi gagal menyimpan data profil: ${profileResult.message}"
-                )
-            }
-
-            // JIKA KETIGANYA SUKSES
+            // JIKA SEMUA TAHAPAN SUKSES
             ResultState.Success(Unit)
         }
     }
