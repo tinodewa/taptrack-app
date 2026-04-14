@@ -75,7 +75,9 @@ class TapTrackRepository(
                             id = dto.id ?: "",
                             title = dto.title ?: "TBA",
                             startDatetime = dto.startDatetime ?: "",
-                            status = dto.status ?: "UPCOMING"
+                            status = dto.status ?: "UPCOMING",
+                            descriptionText = "",
+                            checkpointCount = 0
                         )
                     }
 
@@ -91,27 +93,41 @@ class TapTrackRepository(
         }
     }
 
-    suspend fun getEventDetail(eventId: String): ResultState<EventDetail> {
+    // 1. Jalur UI: Membaca secara real-time dari lokal
+    fun getEventDetailFlow(eventId: String): Flow<EventEntity?> {
+        return eventDao.getEventByIdFlow(eventId)
+    }
+
+    // 2. Jalur Jaringan: Menarik dari Golang dan menimpa data lokal
+    suspend fun syncEventDetail(eventId: String): ResultState<Unit> {
         return withContext(ioDispatcher) {
             val result = handleApiCall(
                 apiCall = { tapTrackApi.getEventDetail(eventId) },
-                tag = "Repo_GetEventDetail"
+                tag = "Repo_SyncEventDetail"
             )
 
             when (result) {
                 is ResultState.Success -> {
-                    // Bongkar Response, pastikan objek data tidak null
-                    val detail = result.data.data
-                    if (detail != null) {
-                        ResultState.Success(detail)
-                    } else {
-                        ResultState.Error(404, "Data detail acara tidak ditemukan.")
-                    }
-                }
+                    val dto = result.data.data ?: return@withContext ResultState.Error(404, "Data kosong")
 
-                is ResultState.Error -> {
-                    ResultState.Error(result.statusCode, result.message)
+                    // Simpan/Timpa ke Room SQLite
+                    val entity = EventEntity(
+                        id = dto.id ?: "",
+                        title = dto.title ?: "Acara Tanpa Nama",
+                        startDatetime = dto.startDatetime ?: "",
+                        status = dto.status ?: "UPCOMING",
+                        descriptionText = dto.descriptionText ?: "",
+                        checkpointCount = dto.checkpoints.size
+                    )
+
+                    eventDao.upsertEvents(listOf(entity))
+
+                    // Jika kamu juga ingin menyimpan Checkpoints ke lokal,
+                    // kamu bisa menyimpannya ke CheckpointDao di sini.
+
+                    ResultState.Success(Unit)
                 }
+                is ResultState.Error -> ResultState.Error(result.statusCode, result.message)
             }
         }
     }
@@ -358,7 +374,9 @@ class TapTrackRepository(
                         id = newEventId,
                         title = request.title ?: "Acara Baru",
                         startDatetime = request.startDatetime ?: "",
-                        status = newStatus
+                        status = newStatus,
+                        descriptionText = "",
+                        checkpointCount = 0
                     )
                     eventDao.upsertEvents(listOf(newEntity))
 

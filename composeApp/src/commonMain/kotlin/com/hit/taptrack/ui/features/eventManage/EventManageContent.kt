@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.ui.features.eventManage.components.EventStateControllerCard
 import com.hit.taptrack.ui.features.eventManage.components.ParticipantRow
 import com.hit.taptrack.ui.features.eventManage.components.ScannerActionCard
@@ -38,7 +39,11 @@ fun EventManageCompact(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
-            EventStateControllerCard(uiState.eventStatus, uiState.isStatusChanging, onEvent)
+            EventStateControllerCard(
+                currentStatus = uiState.eventDetail?.status ?: EventStatus.UPCOMING,
+                isChanging = uiState.isStatusChanging,
+                onEvent = onEvent
+            )
         }
         item {
             ScannerActionCard(onNavigateToScanner)
@@ -68,7 +73,11 @@ fun EventManageExpanded(
     ) {
         // Kiri: Kontrol Utama
         Column(modifier = Modifier.weight(0.8f)) {
-            EventStateControllerCard(uiState.eventStatus, uiState.isStatusChanging, onEvent)
+            EventStateControllerCard(
+                currentStatus = uiState.eventDetail?.status ?: EventStatus.UPCOMING,
+                isChanging = uiState.isStatusChanging,
+                onEvent = onEvent
+            )
             Spacer(modifier = Modifier.height(24.dp))
             ScannerActionCard(onNavigateToScanner)
         }

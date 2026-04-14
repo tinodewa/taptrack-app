@@ -99,13 +99,18 @@ fun EventDetailCompact(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 InfoRow(icon = Icons.Default.CalendarToday, text = detail.date)
+
+                // Location, , implemented in the future
+//                Spacer(modifier = Modifier.height(8.dp))
+//                InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
+
                 Spacer(modifier = Modifier.height(8.dp))
-                InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
-                Spacer(modifier = Modifier.height(8.dp))
-                InfoRow(
-                    icon = Icons.Default.Group,
-                    text = "${detail.registeredRacers} / ${detail.maxCapacity} Peserta Terdaftar"
-                )
+
+                // Registered Racers, , implemented in the future
+//                InfoRow(
+//                    icon = Icons.Default.Group,
+//                    text = "${detail.registeredRacers} / ${detail.maxCapacity} Peserta Terdaftar"
+//                )
 
                 // SISIPKAN KARTU LEADERBOARD DI SINI (Tepat di bawah info utama)
                 LeaderboardAccessCard(status = detail.status, onClick = onNavigateToLeaderboard)
@@ -122,23 +127,25 @@ fun EventDetailCompact(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                // Class category, implemented in the future
+//                Spacer(modifier = Modifier.height(24.dp))
+//
+//                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
+//                Spacer(modifier = Modifier.height(8.dp))
+//                detail.categories.forEach { category ->
+//                    CategoryChip(category)
+//                }
 
-                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.height(8.dp))
-                detail.categories.forEach { category ->
-                    CategoryChip(category)
-                }
+                // Rules, implemented in the future
+//                Spacer(modifier = Modifier.height(24.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(text = "Regulasi", style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = detail.rules,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
+//                Text(text = "Regulasi", style = MaterialTheme.typography.titleLarge)
+//                Spacer(modifier = Modifier.height(8.dp))
+//                Text(
+//                    text = detail.rules,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = MaterialTheme.colorScheme.error
+//                )
             }
         }
 
@@ -212,13 +219,17 @@ fun EventDetailExpanded(
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     InfoRow(icon = Icons.Default.CalendarToday, text = detail.date)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    InfoRow(
-                        icon = Icons.Default.Group,
-                        text = "${detail.registeredRacers} / ${detail.maxCapacity} Terdaftar"
-                    )
+
+                    // Location, , implemented in the future
+//                    Spacer(modifier = Modifier.height(12.dp))
+//                    InfoRow(icon = Icons.Default.LocationOn, text = detail.location)
+
+                    // Registered Racers, , implemented in the future
+//                    Spacer(modifier = Modifier.height(12.dp))
+//                    InfoRow(
+//                        icon = Icons.Default.Group,
+//                        text = "${detail.registeredRacers} / ${detail.maxCapacity} Terdaftar"
+//                    )
 
                     // SISIPKAN KARTU LEADERBOARD DI SINI (Tepat di bawah info utama)
                     LeaderboardAccessCard(status = detail.status, onClick = onNavigateToLeaderboard)
@@ -238,19 +249,22 @@ fun EventDetailExpanded(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(32.dp).fillMaxHeight()) {
-                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.height(12.dp))
-                detail.categories.forEach { CategoryChip(it) }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                // Class category, implemented in the future
+//                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
+//                Spacer(modifier = Modifier.height(12.dp))
+//                detail.categories.forEach { CategoryChip(it) }
+//
+//                Spacer(modifier = Modifier.height(32.dp))
 
-                Text(text = "Regulasi Khusus", style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = detail.rules,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
+                // Rules, implemented in the future
+//                Text(text = "Regulasi Khusus", style = MaterialTheme.typography.titleLarge)
+//                Spacer(modifier = Modifier.height(12.dp))
+//                Text(
+//                    text = detail.rules,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = MaterialTheme.colorScheme.error
+//                )
 
                 Spacer(modifier = Modifier.weight(1f)) // Dorong tombol ke paling bawah
 

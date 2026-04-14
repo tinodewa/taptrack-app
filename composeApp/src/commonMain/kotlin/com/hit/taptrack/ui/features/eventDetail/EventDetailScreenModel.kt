@@ -36,14 +36,15 @@ class EventDetailScreenModel(
 
         _uiState.update { it.copy(userRole = mappedRole) }
 
-        // Langsung muat data detail acara
-        loadEventDetail()
+        // Mulai pemantauan lokal dan sinkronisasi jaringan
+        observeEventDetail()
+        syncEventDetailFromApi()
 
     }
 
     fun onEvent(event: EventDetailEvent) {
         when (event) {
-            EventDetailEvent.RefreshData -> loadEventDetail()
+            EventDetailEvent.RefreshData -> syncEventDetailFromApi()
             EventDetailEvent.ShowJoinDialog -> _uiState.update {
                 it.copy(
                     showJoinDialog = true,
@@ -61,39 +62,43 @@ class EventDetailScreenModel(
         }
     }
 
-    private fun loadEventDetail() {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
+    private fun observeEventDetail() {
         screenModelScope.launch {
-            val result = tapTrackRepository.getEventDetail(eventId)
-
-            when (result) {
-                is ResultState.Success -> {
-                    val dto = result.data
-
-                    // Format ulang array checkpoints menjadi string lokasi/deskripsi
-                    val totalCheckpoints = dto.checkpoints.size
-
+            // UI State akan otomatis ter-update setiap kali ada perubahan di Room
+            tapTrackRepository.getEventDetailFlow(eventId).collect { entity ->
+                if (entity != null) {
                     val mappedDetail = EventDetailModel(
-                        id = dto.id ?: "",
-                        name = dto.title ?: "Acara Tanpa Nama",
-                        date = dto.startDatetime ?: "TBA",
-                        description = dto.descriptionText ?: "Tidak ada deskripsi tersedia.",
-                        location = "Sirkuit Utama ($totalCheckpoints Pos)",
-                        status = mapStringToStatus(dto.status),
-                        rules = "Rules here", // Placeholder, API belum menyediakan data ini
-                        categories = List(totalCheckpoints) { index -> "Kategori Pos ${index + 1}" }, // Placeholder, API belum menyediakan data ini
-                        registeredRacers = 50, // Placeholder, API belum menyediakan data ini
-                        maxCapacity = 100 // Placeholder, API belum menyediakan data ini
+                        id = entity.id,
+                        name = entity.title,
+                        description = entity.descriptionText,
+                        date = entity.startDatetime,
+                        status = mapStringToStatus(entity.status),
+                        checkpointCount = 0 // Jika tidak disimpan di EventEntity, bisa diabaikan atau ditarik dari CheckpointDao terpisah
                     )
-
                     _uiState.update { it.copy(isLoading = false, eventDetail = mappedDetail) }
-                }
-
-                is ResultState.Error -> {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+                } else {
+                    // Jika data belum ada sama sekali di lokal
+                    _uiState.update { it.copy(isLoading = true) }
                 }
             }
+        }
+    }
+
+    private fun syncEventDetailFromApi() {
+        screenModelScope.launch {
+            // Jangan ubah isLoading menjadi true jika data sudah ada di lokal
+            // agar layar tidak berkedip kosong saat me-refresh.
+            if (_uiState.value.eventDetail == null) {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
+
+            val result = tapTrackRepository.syncEventDetail(eventId)
+
+            if (result is ResultState.Error) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+            }
+            // Jika sukses, kita tidak perlu melakukan apa-apa di sini karena
+            // fungsi observeEventDetail() akan otomatis membaca data yang baru masuk ke Room.
         }
     }
 

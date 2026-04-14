@@ -50,7 +50,8 @@ data class EventManageScreen(val eventId: String) : Screen {
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
-                            uiState.eventName,
+                            // AMAN: Gunakan data dari model, beri fallback saat loading
+                            text = uiState.eventDetail?.name ?: "Memuat data...",
                             style = MaterialTheme.typography.titleLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis

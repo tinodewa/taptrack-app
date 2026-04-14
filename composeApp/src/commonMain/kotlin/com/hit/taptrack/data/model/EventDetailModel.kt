@@ -8,10 +8,6 @@ data class EventDetailModel(
     val name: String,
     val description: String,
     val date: String,
-    val location: String,
-    val rules: String,
-    val categories: List<String>, // Kelas balapan, misal: "Bebek 4T 130cc", "Sport 250cc"
-    val status: EventStatus, // Menggunakan enum dari penemuan acara
-    val registeredRacers: Int,
-    val maxCapacity: Int
+    val status: EventStatus,
+    val checkpointCount: Int
 )

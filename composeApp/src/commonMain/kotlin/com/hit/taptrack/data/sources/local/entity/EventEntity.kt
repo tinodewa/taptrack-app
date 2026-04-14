@@ -10,5 +10,7 @@ data class EventEntity(
     val title: String,
     val startDatetime: String,
     val status: String,
+    val descriptionText: String,
+    val checkpointCount: Int,
     val lastUpdated: Long = Clock.System.now().toEpochMilliseconds()
 )

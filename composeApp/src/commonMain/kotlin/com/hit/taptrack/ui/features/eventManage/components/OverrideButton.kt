@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun OverrideButton(text: String, color: Color, isLoading: Boolean, onClick: () -> Unit) {
     Button(

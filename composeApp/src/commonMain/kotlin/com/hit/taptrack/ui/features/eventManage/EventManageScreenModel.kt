@@ -5,6 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.common.state.ParticipantStatus
 import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.model.EventDetailModel
+import com.hit.taptrack.data.model.EventModel
 import com.hit.taptrack.data.model.ParticipantModel
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.eventManage.states.EventManageEvent
@@ -25,8 +27,9 @@ class EventManageScreenModel(
     val uiState: StateFlow<EventManageUiState> = _uiState.asStateFlow()
 
     init {
-        observeParticipants()
-        loadEventData()
+        observeEventDetail() // 1. Pantau detail acara dari lokal
+        observeParticipants() // 2. Pantau peserta dari lokal
+        loadEventData()       // 3. Sinkronisasi API di background
     }
 
     fun onEvent(event: EventManageEvent) {
@@ -38,6 +41,25 @@ class EventManageScreenModel(
                 event.registrationId,
                 event.newStatus
             )
+        }
+    }
+
+    // --- FITUR BARU: OFFLINE-FIRST EVENT DETAIL ---
+    private fun observeEventDetail() {
+        screenModelScope.launch {
+            tapTrackRepository.getEventDetailFlow(eventId).collect { entity ->
+                if (entity != null) {
+                    val mappedDetail = EventDetailModel(
+                        id = entity.id,
+                        name = entity.title,
+                        description = entity.descriptionText,
+                        date = entity.startDatetime,
+                        status = mapStringToStatus(entity.status),
+                        checkpointCount = 0
+                    )
+                    _uiState.update { it.copy(eventDetail = mappedDetail) }
+                }
+            }
         }
     }
 
@@ -65,11 +87,16 @@ class EventManageScreenModel(
                 _uiState.update { it.copy(isLoading = true) }
             }
 
-            // Sync from API
+            // Sync peserta dari API
             val result = tapTrackRepository.syncParticipants(eventId)
             if (result is ResultState.Error) {
-                _uiState.update { it.copy(errorMessage = result.message) }
+                _uiState.update { it.copy(errorMessage = result.message, isLoading = false) }
+            } else {
+                _uiState.update { it.copy(isLoading = false) }
             }
+
+            // Opsional: Jika butuh kepastian data acara paling baru,
+            // kamu bisa memanggil tapTrackRepository.syncEventDetail(eventId) di sini juga.
         }
     }
 
@@ -83,23 +110,14 @@ class EventManageScreenModel(
 
             when (result) {
                 is ResultState.Success -> {
-                    // Berhasil! Matikan loading dan perbarui UI dengan status baru
-                    _uiState.update {
-                        it.copy(
-                            isStatusChanging = false,
-                            eventStatus = newStatus
-                        )
-                    }
+                    // CUKUP MATIKAN LOADING!
+                    // Kita TIDAK PERLU update eventStatus manual di sini,
+                    // karena observeEventDetail() akan otomatis menangkap perubahan di Room
+                    // dan meng-update UI seketika.
+                    _uiState.update { it.copy(isStatusChanging = false) }
                 }
-
                 is ResultState.Error -> {
-                    // Gagal, matikan loading dan tampilkan pesan error
-                    _uiState.update {
-                        it.copy(
-                            isStatusChanging = false,
-                            errorMessage = result.message
-                        )
-                    }
+                    _uiState.update { it.copy(isStatusChanging = false, errorMessage = result.message) }
                 }
             }
         }
@@ -155,6 +173,15 @@ class EventManageScreenModel(
             "DNF" -> ParticipantStatus.DNF
             "DSQ", "DISQUALIFIED" -> ParticipantStatus.DSQ
             else -> ParticipantStatus.UNKNOWN
+        }
+    }
+
+    private fun mapStringToStatus(status: String?): EventStatus {
+        return when (status?.uppercase()) {
+            "UPCOMING" -> EventStatus.UPCOMING
+            "ACTIVE", "LIVE" -> EventStatus.ACTIVE
+            "COMPLETED", "FINISHED" -> EventStatus.FINISHED
+            else -> EventStatus.UPCOMING
         }
     }
 }
