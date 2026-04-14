@@ -63,7 +63,7 @@ interface TapTrackApi {
     @GET("events/{event_id}")
     suspend fun getEventDetail(@Path("event_id") eventId: String): Response<EventDetailResponse>
 
-    @GET("events/{event_id}/checkpoint")
+    @GET("events/{event_id}/checkpoints")
     suspend fun getEventCheckpointByEventId(@Path("event_id") eventId: String): Response<EventCheckpointsResponse>
 
     // --- RACER ---
@@ -101,7 +101,7 @@ interface TapTrackApi {
     ): Response<OverrideParticipantStatusResponse>
 
     // Scans QR
-    @POST("scans")
+    @POST("scans/")
     suspend fun scanQr(@Body request: ScanQrRequest): Response<ScanQrResponse>
 
 }

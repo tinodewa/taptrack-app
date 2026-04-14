@@ -58,9 +58,12 @@ fun ScanCompact(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(8.dp))
+
         CheckpointSelector(
+            checkpoints = uiState.checkpoints,
             selected = uiState.selectedCheckpoint,
-            onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) })
+            onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) }
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -90,7 +93,11 @@ fun ScanCompact(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize(0.7f)
-                                .border(4.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                                .border(
+                                    4.dp,
+                                    MaterialTheme.colorScheme.primary,
+                                    RoundedCornerShape(16.dp)
+                                )
                         )
 
                         // 3. Your Custom Laser Line
@@ -227,9 +234,12 @@ fun ScanExpanded(uiState: ScanUiState, onEvent: (ScanEvent) -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
             Text("Lokasi Checkpoint:", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
+
             CheckpointSelector(
+                checkpoints = uiState.checkpoints,
                 selected = uiState.selectedCheckpoint,
-                onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) })
+                onSelect = { onEvent(ScanEvent.CheckpointSelected(it)) }
+            )
 
             Spacer(modifier = Modifier.height(48.dp))
             Text("Input Manual (Fallback)", style = MaterialTheme.typography.titleMedium)

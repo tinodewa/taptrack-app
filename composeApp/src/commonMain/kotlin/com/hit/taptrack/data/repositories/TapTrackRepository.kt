@@ -1,10 +1,12 @@
 package com.hit.taptrack.data.repositories
 
 import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.sources.local.dao.CheckpointDao
 import com.hit.taptrack.data.sources.local.dao.EventDao
 import com.hit.taptrack.data.sources.local.dao.ParticipantDao
 import com.hit.taptrack.data.sources.local.dao.ScanLogDao
 import com.hit.taptrack.data.sources.local.dao.TicketDao
+import com.hit.taptrack.data.sources.local.entity.CheckpointEntity
 import com.hit.taptrack.data.sources.local.entity.EventEntity
 import com.hit.taptrack.data.sources.local.entity.ParticipantEntity
 import com.hit.taptrack.data.sources.local.entity.ScanLogEntity
@@ -38,6 +40,7 @@ class TapTrackRepository(
     private val ticketDao: TicketDao,
     private val scanLogDao: ScanLogDao,
     private val participantDao: ParticipantDao,
+    private val checkpointDao: CheckpointDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
     // 1. UI akan mengobservasi Flow ini. Setiap ada perubahan di DB, UI otomatis update.
@@ -45,6 +48,10 @@ class TapTrackRepository(
 
     // 1. Ekspos Flow ke UI
     val myTicketsFlow: Flow<List<TicketEntity>> = ticketDao.getAllTickets()
+
+    // Flow untuk dibaca oleh UI secara luring
+    fun getCheckpointsFlow(eventId: String): Flow<List<CheckpointEntity>> =
+        checkpointDao.getCheckpointsByEvent(eventId)
 
     // Observe participants for a specific event
     fun getParticipantsFlow(eventId: String): Flow<List<ParticipantEntity>> =
@@ -176,7 +183,7 @@ class TapTrackRepository(
                 qrTokenHash = request.qrTokenHash ?: "",
                 checkpointId = request.checkpointId ?: "",
                 absoluteTimestamp = request.absoluteTimestamp ?: "",
-                manualOverrideFlag = request.manualOverrideFlag ?: "false",
+                manualOverrideFlag = request.manualOverrideFlag.toString(),
                 syncStatus = "PENDING"
             )
             scanLogDao.insertLog(entity)
@@ -232,7 +239,7 @@ class TapTrackRepository(
                     qrTokenHash = log.qrTokenHash,
                     checkpointId = log.checkpointId,
                     absoluteTimestamp = log.absoluteTimestamp,
-                    manualOverrideFlag = log.manualOverrideFlag
+                    manualOverrideFlag = log.manualOverrideFlag.toBoolean()
                 )
 
                 val result = handleApiCall(
@@ -292,6 +299,7 @@ class TapTrackRepository(
 
                     ResultState.Success(Unit)
                 }
+
                 is ResultState.Error -> {
                     ResultState.Error(result.statusCode, result.message)
                 }
@@ -323,6 +331,7 @@ class TapTrackRepository(
                     participantDao.upsertParticipants(entities)
                     ResultState.Success(Unit)
                 }
+
                 is ResultState.Error -> ResultState.Error(result.statusCode, result.message)
             }
         }
@@ -338,7 +347,10 @@ class TapTrackRepository(
             when (result) {
                 is ResultState.Success -> {
                     // Saat sukses, API biasanya mengembalikan ID Acara yang baru dibuat.
-                    val newEventId = result.data.eventId ?: return@withContext ResultState.Error(500, "ID Acara tidak ditemukan dari server")
+                    val newEventId = result.data.eventId ?: return@withContext ResultState.Error(
+                        500,
+                        "ID Acara tidak ditemukan dari server"
+                    )
                     val newStatus = result.data.status ?: "UPCOMING"
 
                     // Langsung masukkan ke Room Database lokal!
@@ -352,9 +364,37 @@ class TapTrackRepository(
 
                     ResultState.Success(result.data)
                 }
+
                 is ResultState.Error -> {
                     ResultState.Error(result.statusCode, result.message)
                 }
+            }
+        }
+    }
+
+    suspend fun syncCheckpoints(eventId: String): ResultState<Unit> {
+        return withContext(ioDispatcher) {
+            val result = handleApiCall(
+                apiCall = { tapTrackApi.getEventCheckpointByEventId(eventId) },
+                tag = "Repo_SyncCheckpoints"
+            )
+            when (result) {
+                is ResultState.Success -> {
+                    val dtoList = result.data.data
+                    val entities = dtoList.map { dto ->
+                        CheckpointEntity(
+                            id = dto.id ?: "",
+                            eventId = eventId,
+                            checkpointName = dto.checkpointName ?: "Unknown",
+                            typeFlag = dto.typeFlag ?: "MIDDLE",
+                            sequenceOrder = dto.sequenceOrder ?: 0
+                        )
+                    }
+                    checkpointDao.upsertCheckpoints(entities)
+                    ResultState.Success(Unit)
+                }
+
+                is ResultState.Error -> ResultState.Error(result.statusCode, result.message)
             }
         }
     }
