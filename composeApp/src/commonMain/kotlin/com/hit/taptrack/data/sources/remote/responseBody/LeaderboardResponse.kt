@@ -14,6 +14,6 @@ data class Leaderboard(
     @SerialName("rank") var rank: Int? = null,
     @SerialName("race_number") var raceNumber: String? = null,
     @SerialName("racer_name") var racerName: String? = null,
-    @SerialName("elapsed_time_ms") var elapsedTimeMs: Int? = null,
+    @SerialName("elapsed_time_ms") var elapsedTimeMs: Long? = null,
     @SerialName("status") var status: String? = null
 )

@@ -68,7 +68,7 @@ interface TapTrackApi {
 
     // --- RACER ---
     // Registrations
-    @POST("registrations")
+    @POST("registrations/")
     suspend fun joinEvent(@Body request: EventRegistrationRequest): Response<EventRegisterResponse>
 
     @GET("registrations/my-events")

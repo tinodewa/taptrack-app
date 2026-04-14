@@ -103,7 +103,7 @@ class LeaderboardScreenModel(
     /**
      * Mengubah milidetik (misal: 84350) menjadi format MM:SS.ms (01:24.350)
      */
-    private fun formatTimeMs(timeMs: Int): String {
+    private fun formatTimeMs(timeMs: Long): String {
         val minutes = timeMs / 60000
         val seconds = (timeMs % 60000) / 1000
         val millis = timeMs % 1000
