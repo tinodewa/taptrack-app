@@ -63,18 +63,26 @@ class EventDiscoveryScreenModel(
         }
     }
 
-    fun refreshData() {
+    private fun refreshData() {
         screenModelScope.launch {
-            // Kita tetap set loading jika DB masih kosong
+            // Nyalakan indikator refreshing (animasi muter di atas layar)
+            _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+
+            // Jika DB benar-benar kosong, baru kita nyalakan loading tengah
             if (_uiState.value.allEvents.isEmpty()) {
                 _uiState.update { it.copy(isLoading = true) }
             }
 
+            // Panggil API (Background Sync)
             val result = tapTrackRepository.syncEvents()
 
             if (result is ResultState.Error) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+                _uiState.update { it.copy(errorMessage = result.message) }
             }
+
+            // Matikan SEMUA indikator loading
+            // (observeLocalEvents akan otomatis memperbarui list jika ada data baru)
+            _uiState.update { it.copy(isRefreshing = false, isLoading = false) }
         }
     }
 

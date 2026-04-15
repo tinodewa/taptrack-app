@@ -63,9 +63,10 @@ class MyTicketsScreenModel(
 
     private fun refreshData() {
         screenModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
             // Tampilkan loading HANYA jika list tiket masih kosong (belum ada cache)
             if (_uiState.value.tickets.isEmpty()) {
-                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+                _uiState.update { it.copy(isLoading = true) }
             }
 
             val result = tapTrackRepository.syncMyTickets()
@@ -75,10 +76,13 @@ class MyTicketsScreenModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        isRefreshing = false,
                         // Hanya tampilkan pesan error jika data lokal juga kosong
                         errorMessage = if (_uiState.value.tickets.isEmpty()) result.message else null
                     )
                 }
+            } else {
+                _uiState.update { it.copy(isRefreshing = false, isLoading = false) }
             }
         }
     }

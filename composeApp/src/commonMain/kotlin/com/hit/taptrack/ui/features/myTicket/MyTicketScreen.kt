@@ -17,6 +17,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.myTicket.components.QrCodeDialog
 import com.hit.taptrack.ui.features.myTicket.states.MyTicketsEvent
 import com.hit.taptrack.ui.shared.RmsScaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 class MyTicketsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -53,20 +56,39 @@ class MyTicketsScreen : Screen {
                     )
                 }
 
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    } else if (uiState.tickets.isEmpty()) {
-                        Text(
-                            text = "Anda belum mendaftar di acara manapun.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    } else {
-                        if (maxWidth < 800.dp) {
-                            MyTicketsCompact(uiState, screenModel::onEvent)
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = { screenModel.onEvent(MyTicketsEvent.RefreshTickets) },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                        if (uiState.isLoading && !uiState.isRefreshing) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        } else if (uiState.tickets.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Anda belum mendaftar di acara manapun.",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
                         } else {
-                            MyTicketsExpanded(uiState, screenModel::onEvent)
+                            if (maxWidth < 800.dp) {
+                                MyTicketsCompact(uiState, screenModel::onEvent)
+                            } else {
+                                MyTicketsExpanded(uiState, screenModel::onEvent)
+                            }
                         }
                     }
                 }

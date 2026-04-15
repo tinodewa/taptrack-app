@@ -1,5 +1,6 @@
 package com.hit.taptrack.ui.features.eventDetail
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,9 @@ import com.hit.taptrack.ui.features.eventManage.EventManageScreen
 import com.hit.taptrack.ui.features.myTicket.MyTicketsScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 // Kita tambahkan parameter eventId di class Screen
 data class EventDetailScreen(val eventId: String) : Screen {
@@ -56,72 +60,115 @@ data class EventDetailScreen(val eventId: String) : Screen {
             backgroundColor = MaterialTheme.colorScheme.background,
             snackbarHostState = snackbarHostState
         ) { innerPadding ->
-            BoxWithConstraints(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = { screenModel.onEvent(EventDetailEvent.RefreshData) },
+                modifier = Modifier.fillMaxSize().padding(innerPadding)
             ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    uiState.eventDetail?.let { detail ->
-                        if (maxWidth < 800.dp) {
-                            EventDetailCompact(
-                                detail,
-                                uiState,
-                                screenModel::onEvent,
-                                onNavigateToTickets = { navigator.push(MyTicketsScreen()) },
-                                onNavigateToLeaderboard = { navigator.push(LeaderboardScreen(detail.id)) },
-                                onNavigateToManageEvent = { navigator.push(EventManageScreen(detail.id)) },
-                                onBackClick = { navigator.pop() },
-                            )
-                        } else {
-                            EventDetailExpanded(
-                                detail,
-                                uiState,
-                                screenModel::onEvent,
-                                onNavigateToTickets = { navigator.push(MyTicketsScreen()) },
-                                onNavigateToLeaderboard = { navigator.push(LeaderboardScreen(detail.id)) },
-                                onNavigateToManageEvent = { navigator.push(EventManageScreen(detail.id)) },
-                                onBackClick = { navigator.pop() }
-                            )
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    if (uiState.isLoading && !uiState.isRefreshing) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        uiState.eventDetail?.let { detail ->
+                            if (maxWidth < 800.dp) {
+                                EventDetailCompact(
+                                    detail,
+                                    uiState,
+                                    screenModel::onEvent,
+                                    onNavigateToTickets = { navigator.push(MyTicketsScreen()) },
+                                    onNavigateToLeaderboard = {
+                                        navigator.push(
+                                            LeaderboardScreen(
+                                                detail.id
+                                            )
+                                        )
+                                    },
+                                    onNavigateToManageEvent = {
+                                        navigator.push(
+                                            EventManageScreen(
+                                                detail.id
+                                            )
+                                        )
+                                    },
+                                    onBackClick = { navigator.pop() },
+                                )
+                            } else {
+                                EventDetailExpanded(
+                                    detail,
+                                    uiState,
+                                    screenModel::onEvent,
+                                    onNavigateToTickets = { navigator.push(MyTicketsScreen()) },
+                                    onNavigateToLeaderboard = {
+                                        navigator.push(
+                                            LeaderboardScreen(
+                                                detail.id
+                                            )
+                                        )
+                                    },
+                                    onNavigateToManageEvent = {
+                                        navigator.push(
+                                            EventManageScreen(
+                                                detail.id
+                                            )
+                                        )
+                                    },
+                                    onBackClick = { navigator.pop() }
+                                )
+                            }
                         }
                     }
                 }
+            }
 
-                // Pop-up Dialog Input Nomor Lambung
-                if (uiState.showJoinDialog) {
-                    AlertDialog(
-                        onDismissRequest = { screenModel.onEvent(EventDetailEvent.HideJoinDialog) },
-                        title = { Text("Pilih Nomor Lambung") },
-                        text = {
-                            OutlinedTextField(
-                                value = uiState.raceNumberInput,
-                                onValueChange = { screenModel.onEvent(EventDetailEvent.RaceNumberChanged(it)) },
-                                label = { Text("Nomor Start (Cth: 99)") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true
+            // Pop-up Dialog Input Nomor Lambung
+            if (uiState.showJoinDialog) {
+                AlertDialog(
+                    onDismissRequest = { screenModel.onEvent(EventDetailEvent.HideJoinDialog) },
+                    title = { Text("Pilih Nomor Lambung") },
+                    text = {
+                        OutlinedTextField(
+                            value = uiState.raceNumberInput,
+                            onValueChange = {
+                                screenModel.onEvent(
+                                    EventDetailEvent.RaceNumberChanged(
+                                        it
+                                    )
+                                )
+                            },
+                            label = { Text("Nomor Start (Cth: 99)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = { screenModel.onEvent(EventDetailEvent.SubmitJoinEvent) },
+                            enabled = !uiState.isJoinLoading && uiState.raceNumberInput.isNotBlank()
+                        ) {
+                            if (uiState.isJoinLoading) CircularProgressIndicator(
+                                modifier = Modifier.size(
+                                    20.dp
+                                )
                             )
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = { screenModel.onEvent(EventDetailEvent.SubmitJoinEvent) },
-                                enabled = !uiState.isJoinLoading && uiState.raceNumberInput.isNotBlank()
-                            ) {
-                                if (uiState.isJoinLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                                else Text("KONFIRMASI")
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(
-                                onClick = { screenModel.onEvent(EventDetailEvent.HideJoinDialog) },
-                                enabled = !uiState.isJoinLoading
-                            ) {
-                                Text("Batal")
-                            }
+                            else Text("KONFIRMASI")
                         }
-                    )
-                }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { screenModel.onEvent(EventDetailEvent.HideJoinDialog) },
+                            enabled = !uiState.isJoinLoading
+                        ) {
+                            Text("Batal")
+                        }
+                    }
+                )
             }
         }
     }

@@ -1,10 +1,13 @@
 package com.hit.taptrack.ui.features.eventDiscovery
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -13,6 +16,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -73,18 +77,43 @@ class EventDiscoveryScreen : Screen {
                     onTabSelected = { screenModel.onEvent(EventDiscoveryEvent.TabSelected(it)) }
                 )
 
-                // Render area list responsif
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    } else if (uiState.filteredEvents.isEmpty()) {
-                        Text(
-                            text = "Tidak ada acara dalam kategori ini.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    } else {
+                // ==========================================
+                // PULL TO REFRESH BOX DI LEVEL PARENT
+                // ==========================================
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = { screenModel.onEvent(EventDiscoveryEvent.RefreshEvents) },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Render area list responsif
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                        // KONDISI 1: LOADING AWAL
+                        if (uiState.isLoading && !uiState.isRefreshing) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()), // <-- TAMBAHKAN INI
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        // KONDISI 2: DATA KOSONG
+                        else if (uiState.filteredEvents.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()), // <-- TAMBAHKAN INI
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Tidak ada acara dalam kategori ini.",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
+                        // KONDISI 3: ADA DATA (COMPACT / EXPANDED) else {
                         if (maxWidth < 800.dp) {
                             EventDiscoveryCompact(
                                 uiState.filteredEvents,

@@ -44,7 +44,7 @@ class EventDetailScreenModel(
 
     fun onEvent(event: EventDetailEvent) {
         when (event) {
-            EventDetailEvent.RefreshData -> syncEventDetailFromApi()
+            EventDetailEvent.RefreshData -> syncEventDetailFromApi(isRefresh = true)
             EventDetailEvent.ShowJoinDialog -> _uiState.update {
                 it.copy(
                     showJoinDialog = true,
@@ -84,21 +84,24 @@ class EventDetailScreenModel(
         }
     }
 
-    private fun syncEventDetailFromApi() {
+    private fun syncEventDetailFromApi(isRefresh: Boolean = false) {
         screenModelScope.launch {
+            if (isRefresh) {
+                _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+            }
             // Jangan ubah isLoading menjadi true jika data sudah ada di lokal
             // agar layar tidak berkedip kosong saat me-refresh.
-            if (_uiState.value.eventDetail == null) {
+            if (_uiState.value.eventDetail == null && !isRefresh) {
                 _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             }
 
             val result = tapTrackRepository.syncEventDetail(eventId)
 
             if (result is ResultState.Error) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+                _uiState.update { it.copy(isLoading = false, isRefreshing = false, errorMessage = result.message) }
+            } else {
+                _uiState.update { it.copy(isLoading = false, isRefreshing = false) }
             }
-            // Jika sukses, kita tidak perlu melakukan apa-apa di sini karena
-            // fungsi observeEventDetail() akan otomatis membaca data yang baru masuk ke Room.
         }
     }
 

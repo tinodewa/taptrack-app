@@ -1,5 +1,6 @@
 package com.hit.taptrack.ui.features.profile
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hit.taptrack.ui.features.auth.login.LoginScreen
 import com.hit.taptrack.ui.features.initial.landing.LandingScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 class ProfileScreen : Screen {
     @Composable
@@ -38,16 +42,35 @@ class ProfileScreen : Screen {
         RmsScaffold(
             backgroundColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->
-            BoxWithConstraints(
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = { screenModel.onEvent(com.hit.taptrack.ui.features.profile.states.ProfileEvent.RefreshProfile) },
                 modifier = Modifier.fillMaxSize().padding(innerPadding)
             ) {
-                if (uiState.isLoading && uiState.profile == null) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else if (uiState.profile != null) {
-                    if (maxWidth < 800.dp) {
-                        ProfileCompact(uiState.profile!!, screenModel::onEvent) { navigator.pop() }
-                    } else {
-                        ProfileExpanded(uiState.profile!!, screenModel::onEvent) { navigator.pop() }
+                BoxWithConstraints(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (uiState.isLoading && !uiState.isRefreshing) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else if (uiState.profile != null) {
+                        if (maxWidth < 800.dp) {
+                            ProfileCompact(
+                                uiState.profile!!,
+                                screenModel::onEvent
+                            ) { navigator.pop() }
+                        } else {
+                            ProfileExpanded(
+                                uiState.profile!!,
+                                screenModel::onEvent
+                            ) { navigator.pop() }
+                        }
                     }
                 }
             }

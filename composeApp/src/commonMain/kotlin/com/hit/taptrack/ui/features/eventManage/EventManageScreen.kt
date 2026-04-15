@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,39 +60,55 @@ data class EventManageScreen(val eventId: String) : Screen {
                     }
                 }
 
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    if (uiState.isLoading) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    } else {
-                        // Sekarang maxWidth sudah bisa diakses dari BoxWithConstraintsScope
-                        if (maxWidth < 800.dp) {
-                            EventManageCompact(uiState, screenModel::onEvent) {
-                                navigator.push(
-                                    ScanScreen(eventId)
-                                )
+                // ==========================================
+                // MAGIC HAPPENS HERE: Gunakan PullToRefreshBox
+                // ==========================================
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = { screenModel.onEvent(EventManageEvent.RefreshData) },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // KONTEN DI BAWAH INI AKAN BISA DITARIK
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                        if (uiState.isLoading) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
                             }
                         } else {
-                            EventManageExpanded(uiState, screenModel::onEvent) {
-                                navigator.push(
-                                    ScanScreen(eventId)
-                                )
+                            // Sekarang maxWidth sudah bisa diakses dari BoxWithConstraintsScope
+                            if (maxWidth < 800.dp) {
+                                EventManageCompact(uiState, screenModel::onEvent) {
+                                    navigator.push(
+                                        ScanScreen(eventId)
+                                    )
+                                }
+                            } else {
+                                EventManageExpanded(uiState, screenModel::onEvent) {
+                                    navigator.push(
+                                        ScanScreen(eventId)
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    // --- TAMBAHKAN PEMANGGILAN DIALOG DI SINI ---
-                    if (uiState.selectedParticipant != null) {
-                        OverrideParticipantDialog(
-                            participant = uiState.selectedParticipant!!,
-                            isLoading = uiState.isOverrideLoading,
-                            onEvent = screenModel::onEvent,
-                            onDismiss = { screenModel.onEvent(EventManageEvent.SelectParticipant(null)) }
-                        )
+                        // --- TAMBAHKAN PEMANGGILAN DIALOG DI SINI ---
+                        if (uiState.selectedParticipant != null) {
+                            OverrideParticipantDialog(
+                                participant = uiState.selectedParticipant!!,
+                                isLoading = uiState.isOverrideLoading,
+                                onEvent = screenModel::onEvent,
+                                onDismiss = {
+                                    screenModel.onEvent(
+                                        EventManageEvent.SelectParticipant(
+                                            null
+                                        )
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }

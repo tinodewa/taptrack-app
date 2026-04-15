@@ -5,6 +5,7 @@ import com.hit.taptrack.data.model.EventDetailModel
 
 data class EventDetailUiState(
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val eventDetail: EventDetailModel? = null,
     val userRole: UserRole = UserRole.RACER, // Default simulasi: Racer
 

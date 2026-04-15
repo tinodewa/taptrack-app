@@ -31,13 +31,17 @@ class ProfileScreenModel(
     fun onEvent(event: ProfileEvent) {
         when (event) {
             ProfileEvent.LogoutClicked -> processLogout()
-            ProfileEvent.RefreshProfile -> loadProfile()
+            ProfileEvent.RefreshProfile -> loadProfile(isRefresh = true)
         }
     }
 
-    private fun loadProfile() {
+    private fun loadProfile(isRefresh: Boolean = false) {
         screenModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            if (isRefresh) {
+                _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+            } else {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
 
             // Panggil API dari Repository
             val result = authRepository.getProfile()
@@ -58,12 +62,12 @@ class ProfileScreenModel(
                     )
 
                     _uiState.update {
-                        it.copy(isLoading = false, profile = actualProfile)
+                        it.copy(isLoading = false, isRefreshing = false, profile = actualProfile)
                     }
                 }
                 is ResultState.Error -> {
                     _uiState.update {
-                        it.copy(isLoading = false, errorMessage = result.message)
+                        it.copy(isLoading = false, isRefreshing = false, errorMessage = result.message)
                     }
                 }
             }

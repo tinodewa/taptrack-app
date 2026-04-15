@@ -34,7 +34,7 @@ class EventManageScreenModel(
 
     fun onEvent(event: EventManageEvent) {
         when (event) {
-            EventManageEvent.RefreshData -> loadEventData()
+            EventManageEvent.RefreshData -> refreshData()
             is EventManageEvent.ChangeEventStatus -> updateEventStatus(event.newStatus)
             is EventManageEvent.SelectParticipant -> _uiState.update { it.copy(selectedParticipant = event.participant) }
             is EventManageEvent.OverrideParticipantStatus -> overrideParticipant(
@@ -156,6 +156,26 @@ class EventManageScreenModel(
                     }
                 }
             }
+        }
+    }
+
+    private fun refreshData() {
+        screenModelScope.launch {
+            // Nyalakan indikator refreshing (bukan isLoading awal)
+            _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+
+            // Lakukan sinkronisasi dari API ke Room
+            // (observeEventDetail dan observeParticipants akan otomatis
+            // membaca data barunya jika ada perubahan)
+            val syncDetail = tapTrackRepository.syncEventDetail(eventId)
+            val syncParticipants = tapTrackRepository.syncParticipants(eventId)
+
+            if (syncParticipants is ResultState.Error) {
+                _uiState.update { it.copy(errorMessage = syncParticipants.message) }
+            }
+
+            // Matikan indikator refreshing
+            _uiState.update { it.copy(isRefreshing = false) }
         }
     }
 

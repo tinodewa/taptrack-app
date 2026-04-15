@@ -35,13 +35,17 @@ class LeaderboardScreenModel(
                 // Untuk sekarang, kita muat ulang.
                 loadLeaderboard()
             }
-            LeaderboardEvent.RefreshLeaderboard -> loadLeaderboard()
+            LeaderboardEvent.RefreshLeaderboard -> loadLeaderboard(isRefresh = true)
         }
     }
 
-    private fun loadLeaderboard() {
+    private fun loadLeaderboard(isRefresh: Boolean = false) {
         screenModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            if (isRefresh) {
+                _uiState.update { it.copy(isRefreshing = true, errorMessage = null) }
+            } else {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            }
 
             val result = tapTrackRepository.getLeaderboard(eventId)
 
@@ -80,6 +84,7 @@ class LeaderboardScreenModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             // Fallback jika UI tidak memiliki referensi nama acara dari halaman sebelumnya
                             eventName = "Live Leaderboard",
                             entries = mappedEntries
@@ -90,6 +95,7 @@ class LeaderboardScreenModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             errorMessage = result.message
                         )
                     }

@@ -21,6 +21,9 @@ import com.hit.taptrack.ui.features.leaderboard.components.LeaderboardTable
 import com.hit.taptrack.ui.features.leaderboard.states.LeaderboardEvent
 import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 data class LeaderboardScreen(val eventId: String) : Screen {
     @Composable
@@ -46,13 +49,24 @@ data class LeaderboardScreen(val eventId: String) : Screen {
                     selectedCategory = uiState.currentCategory,
                     onCategorySelected = { screenModel.onEvent(LeaderboardEvent.ChangeCategory(it)) }
                 )
-
-                // Tabel Klasemen
-                Box(modifier = Modifier.fillMaxSize()) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    } else {
-                        LeaderboardTable(entries = uiState.entries)
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = { screenModel.onEvent(LeaderboardEvent.RefreshLeaderboard) },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        if (uiState.isLoading && !uiState.isRefreshing) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        } else {
+                            LeaderboardTable(entries = uiState.entries)
+                        }
                     }
                 }
             }

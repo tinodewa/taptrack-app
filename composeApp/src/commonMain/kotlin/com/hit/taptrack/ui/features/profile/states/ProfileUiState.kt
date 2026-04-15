@@ -4,6 +4,7 @@ import com.hit.taptrack.data.model.UserProfileModel
 
 data class ProfileUiState(
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val profile: UserProfileModel? = null,
     val isLoggedOut: Boolean = false,
     val errorMessage: String? = null

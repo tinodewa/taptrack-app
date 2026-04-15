@@ -4,6 +4,7 @@ import com.hit.taptrack.data.model.LeaderboardEntryModel
 
 data class LeaderboardUiState(
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val eventName: String = "",
     val currentCategory: String = "FFA (Free For All)",
     val categories: List<String> = listOf(

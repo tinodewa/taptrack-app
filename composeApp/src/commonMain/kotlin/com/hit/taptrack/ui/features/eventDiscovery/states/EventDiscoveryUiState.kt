@@ -7,6 +7,7 @@ data class EventDiscoveryUiState(
     val filteredEvents: List<EventModel> = emptyList(),
     val selectedTabIndex: Int = 0, // 0: Mendatang, 1: Berlangsung, 2: Selesai
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val isCommittee: Boolean = false,
     val errorMessage: String? = null
 )

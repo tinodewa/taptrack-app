@@ -8,6 +8,7 @@ data class EventManageUiState(
     val eventId: String = "",
     val eventDetail: EventDetailModel? = null,
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val isStatusChanging: Boolean = false,
     val participants: List<ParticipantModel> = emptyList(),
 
