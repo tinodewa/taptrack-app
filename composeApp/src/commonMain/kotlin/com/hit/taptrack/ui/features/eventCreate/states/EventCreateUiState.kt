@@ -1,5 +1,7 @@
 package com.hit.taptrack.ui.features.eventCreate.states
 
+import com.hit.taptrack.data.model.StageInputModel
+
 data class EventCreateUiState(
     val name: String = "",
     val date: String = "",

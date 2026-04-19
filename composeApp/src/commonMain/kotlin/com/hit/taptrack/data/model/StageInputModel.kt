@@ -1,4 +1,4 @@
-package com.hit.taptrack.ui.features.eventCreate.states
+package com.hit.taptrack.data.model
 
 // Model khusus UI untuk membungkus Stage
 data class StageInputModel(

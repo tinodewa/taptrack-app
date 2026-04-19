@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,7 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -25,12 +30,16 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.hit.taptrack.data.model.EventDetailModel
 import com.hit.taptrack.ui.features.eventDetail.components.CategoryChip
@@ -127,25 +136,95 @@ fun EventDetailCompact(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
 
-                // Class category, implemented in the future
-//                Spacer(modifier = Modifier.height(24.dp))
-//
-//                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
-//                Spacer(modifier = Modifier.height(8.dp))
-//                detail.categories.forEach { category ->
-//                    CategoryChip(category)
-//                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Rules, implemented in the future
-//                Spacer(modifier = Modifier.height(24.dp))
+                // ==========================================
+                // 1. BAGIAN KELAS / KATEGORI
+                // ==========================================
+                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(12.dp))
 
-//                Text(text = "Regulasi", style = MaterialTheme.typography.titleLarge)
-//                Spacer(modifier = Modifier.height(8.dp))
-//                Text(
-//                    text = detail.rules,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = MaterialTheme.colorScheme.error
-//                )
+                @OptIn(ExperimentalLayoutApi::class)
+                (FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    detail.categories.forEach { categoryName ->
+                        // Gunakan SuggestionChip atau Box custom untuk kategori
+                        SuggestionChip(
+                            onClick = { },
+                            label = { Text(categoryName, fontWeight = FontWeight.Bold) },
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                labelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
+                            border = null
+                        )
+                    }
+                })
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // ==========================================
+                // 2. BAGIAN RUTE ENDURO (SPECIAL STAGES)
+                // ==========================================
+                Text(text = "Rute Balapan", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (detail.stages.isEmpty()) {
+                    Text("Belum ada rute yang ditentukan.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        detail.stages.forEach { stage ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                elevation = CardDefaults.cardElevation(0.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "Special Stage ${stage.stageNumber}",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Black
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // Render daftar pos dalam SS tersebut
+                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        stage.checkpoints.forEachIndexed { index, cpName ->
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                // Indikator visual kecil
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(8.dp)
+                                                        .background(
+                                                            color = if (index == 0 || index == stage.checkpoints.size - 1)
+                                                                MaterialTheme.colorScheme.primary
+                                                            else
+                                                                Color.Gray,
+                                                            shape = CircleShape
+                                                        )
+                                                )
+                                                Spacer(modifier = Modifier.width(12.dp))
+                                                Text(
+                                                    text = cpName,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp)) // Jarak ekstra sebelum Bottom Bar
             }
         }
 
@@ -250,21 +329,89 @@ fun EventDetailExpanded(
         ) {
             Column(modifier = Modifier.padding(32.dp).fillMaxHeight()) {
 
-                // Class category, implemented in the future
-//                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
-//                Spacer(modifier = Modifier.height(12.dp))
-//                detail.categories.forEach { CategoryChip(it) }
-//
-//                Spacer(modifier = Modifier.height(32.dp))
+                // ==========================================
+                // 1. BAGIAN KELAS / KATEGORI
+                // ==========================================
+                Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(12.dp))
 
-                // Rules, implemented in the future
-//                Text(text = "Regulasi Khusus", style = MaterialTheme.typography.titleLarge)
-//                Spacer(modifier = Modifier.height(12.dp))
-//                Text(
-//                    text = detail.rules,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = MaterialTheme.colorScheme.error
-//                )
+                @OptIn(ExperimentalLayoutApi::class)
+                (FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    detail.categories.forEach { categoryName ->
+                        // Gunakan SuggestionChip atau Box custom untuk kategori
+                        SuggestionChip(
+                            onClick = { },
+                            label = { Text(categoryName, fontWeight = FontWeight.Bold) },
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                labelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
+                            border = null
+                        )
+                    }
+                })
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // ==========================================
+                // 2. BAGIAN RUTE ENDURO (SPECIAL STAGES)
+                // ==========================================
+                Text(text = "Rute Balapan", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (detail.stages.isEmpty()) {
+                    Text("Belum ada rute yang ditentukan.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        detail.stages.forEach { stage ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                elevation = CardDefaults.cardElevation(0.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "Special Stage ${stage.stageNumber}",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Black
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // Render daftar pos dalam SS tersebut
+                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        stage.checkpoints.forEachIndexed { index, cpName ->
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                // Indikator visual kecil
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(8.dp)
+                                                        .background(
+                                                            color = if (index == 0 || index == stage.checkpoints.size - 1)
+                                                                MaterialTheme.colorScheme.primary
+                                                            else
+                                                                Color.Gray,
+                                                            shape = CircleShape
+                                                        )
+                                                )
+                                                Spacer(modifier = Modifier.width(12.dp))
+                                                Text(
+                                                    text = cpName,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.weight(1f)) // Dorong tombol ke paling bawah
 

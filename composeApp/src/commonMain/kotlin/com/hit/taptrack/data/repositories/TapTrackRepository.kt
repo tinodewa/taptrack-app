@@ -60,6 +60,13 @@ class TapTrackRepository(
     fun getParticipantsFlow(eventId: String): Flow<List<ParticipantEntity>> =
         participantDao.getParticipantsByEvent(eventId)
 
+    fun getEventDetailFlow(eventId: String): Flow<EventEntity?> =
+        eventDao.getEventByIdFlow(eventId)
+
+
+    fun getCategoriesFlow(eventId: String): Flow<List<CategoryEntity>> =
+        categoryDao.getCategoriesByEventFlow(eventId)
+
     // 2. Fungsi untuk sinkronisasi data dari API ke Local DB
     suspend fun syncEvents(): ResultState<Unit> {
         return withContext(ioDispatcher) {
@@ -94,11 +101,6 @@ class TapTrackRepository(
                 }
             }
         }
-    }
-
-    // 1. Jalur UI: Membaca secara real-time dari lokal
-    fun getEventDetailFlow(eventId: String): Flow<EventEntity?> {
-        return eventDao.getEventByIdFlow(eventId)
     }
 
     // 2. Jalur Jaringan: Menarik dari Golang dan menimpa data lokal

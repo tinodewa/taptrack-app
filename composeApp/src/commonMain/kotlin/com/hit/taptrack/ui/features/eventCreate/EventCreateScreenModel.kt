@@ -3,12 +3,12 @@ package com.hit.taptrack.ui.features.eventCreate
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.model.StageInputModel
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.data.sources.remote.requestBody.CreateEventRequest
 import com.hit.taptrack.data.sources.remote.responseBody.CheckpointDetail
 import com.hit.taptrack.ui.features.eventCreate.states.EventCreateEvent
 import com.hit.taptrack.ui.features.eventCreate.states.EventCreateUiState
-import com.hit.taptrack.ui.features.eventCreate.states.StageInputModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

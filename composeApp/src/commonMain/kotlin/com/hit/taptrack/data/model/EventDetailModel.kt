@@ -9,5 +9,6 @@ data class EventDetailModel(
     val description: String,
     val date: String,
     val status: EventStatus,
-    val checkpointCount: Int
+    val categories: List<String>, // Menampung nama kategori
+    val stages: List<StageUiModel> // Menampung rute per SS
 )

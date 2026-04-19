@@ -6,14 +6,15 @@ import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.common.state.UserRole
 import com.hit.taptrack.data.model.EventDetailModel
+import com.hit.taptrack.data.model.StageUiModel
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.eventDetail.states.EventDetailEvent
 import com.hit.taptrack.ui.features.eventDetail.states.EventDetailUiState
 import com.hit.taptrack.utils.helpers.UserSettings
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -64,20 +65,54 @@ class EventDetailScreenModel(
 
     private fun observeEventDetail() {
         screenModelScope.launch {
-            // UI State akan otomatis ter-update setiap kali ada perubahan di Room
-            tapTrackRepository.getEventDetailFlow(eventId).collect { entity ->
-                if (entity != null) {
-                    val mappedDetail = EventDetailModel(
-                        id = entity.id,
-                        name = entity.title,
-                        description = entity.descriptionText,
-                        date = entity.startDatetime,
-                        status = mapStringToStatus(entity.status),
-                        checkpointCount = 0 // Jika tidak disimpan di EventEntity, bisa diabaikan atau ditarik dari CheckpointDao terpisah
-                    )
+            // Gabungkan 3 aliran data dari Room Database
+            combine(
+                tapTrackRepository.getEventDetailFlow(eventId),
+                tapTrackRepository.getCheckpointsFlow(eventId),
+                tapTrackRepository.getCategoriesFlow(eventId)
+            ) { eventEntity, checkpointEntities, categoryEntities ->
+
+                // Jika data acara utama belum ada, kembalikan null
+                if (eventEntity == null) return@combine null
+
+                // 1. Petakan Categories
+                val mappedCategories = categoryEntities.map { it.categoryName }
+
+                // 2. Petakan Checkpoints menjadi Stages (Format Enduro)
+                val groupedStages = checkpointEntities
+                    .groupBy { it.stageNumber } // Kelompokkan berdasarkan SS
+                    .entries // AMBIL PASANGAN KEY-VALUE
+                    .sortedBy { it.key } // URUTKAN BERDASARKAN KEY (stageNumber)
+                    .map { (stageNum, cps) ->
+                        // Urutkan pos berdasarkan sequenceOrder (Start -> Middle -> Finish)
+                        val sortedCps = cps
+                            .sortedBy { it.sequenceOrder }
+                            .map { it.checkpointName }
+
+                        StageUiModel(
+                            stageNumber = stageNum,
+                            checkpoints = sortedCps
+                        )
+                    }
+
+                // 3. Rakit menjadi satu Model UI yang utuh
+                EventDetailModel(
+                    id = eventEntity.id,
+                    name = eventEntity.title,
+                    description = eventEntity.descriptionText,
+                    date = eventEntity.startDatetime,
+                    status = mapStringToStatus(eventEntity.status),
+                    categories = mappedCategories,
+                    stages = groupedStages
+                )
+
+            }.collect { mappedDetail ->
+                // Hasil dari blok combine di atas akan ditangkap di sini
+                if (mappedDetail != null) {
+                    // Data utuh siap dirender UI!
                     _uiState.update { it.copy(isLoading = false, eventDetail = mappedDetail) }
                 } else {
-                    // Jika data belum ada sama sekali di lokal
+                    // Jika eventEntity masih null (data belum masuk Room)
                     _uiState.update { it.copy(isLoading = true) }
                 }
             }
