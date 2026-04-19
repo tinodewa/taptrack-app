@@ -63,7 +63,13 @@ fun CategoriesSection(uiState: EventCreateUiState, onEvent: (EventCreateEvent) -
                     InputChip(
                         selected = true,
                         onClick = { },
-                        label = { Text(category) },
+                        label = {
+                            Text(
+                            category,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        },
                         trailingIcon = {
                             if (uiState.categories.size > 1) { // Jangan izinkan hapus jika sisa 1
                                 IconButton(
@@ -87,9 +93,10 @@ fun CategoriesSection(uiState: EventCreateUiState, onEvent: (EventCreateEvent) -
                 OutlinedTextField(
                     value = newCategory,
                     onValueChange = { newCategory = it },
-                    placeholder = { Text("Tambah Kelas Baru...") },
+                    placeholder = { Text("Tambah Kelas Baru...", style = MaterialTheme.typography.labelLarge) },
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.labelLarge,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(

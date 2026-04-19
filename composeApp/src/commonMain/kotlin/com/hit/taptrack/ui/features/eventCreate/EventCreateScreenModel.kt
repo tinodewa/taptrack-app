@@ -8,6 +8,7 @@ import com.hit.taptrack.data.sources.remote.requestBody.CreateEventRequest
 import com.hit.taptrack.data.sources.remote.responseBody.CheckpointDetail
 import com.hit.taptrack.ui.features.eventCreate.states.EventCreateEvent
 import com.hit.taptrack.ui.features.eventCreate.states.EventCreateUiState
+import com.hit.taptrack.ui.features.eventCreate.states.StageInputModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,25 +43,61 @@ class EventCreateScreenModel(
                 _uiState.update { it.copy(categories = current) }
             }
 
-            is EventCreateEvent.AddCheckpoint -> {
-                val current = _uiState.value.checkpoints.toMutableList()
-                // Sisipkan sebelum elemen terakhir (Garis Finish)
-                val insertIndex = if (current.size > 1) current.size - 1 else current.size
-                current.add(insertIndex, event.name)
-                _uiState.update { it.copy(checkpoints = current) }
+            // --- LOGIKA SPECIAL STAGE ---
+            EventCreateEvent.AddStage -> {
+                val current = _uiState.value.stages.toMutableList()
+                val nextStageNum = (current.maxOfOrNull { it.stageNumber } ?: 0) + 1
+                current.add(
+                    StageInputModel(
+                        stageNumber = nextStageNum,
+                        checkpoints = listOf("SS$nextStageNum Start", "SS$nextStageNum Finish")
+                    )
+                )
+                _uiState.update { it.copy(stages = current) }
             }
-            is EventCreateEvent.RemoveCheckpoint -> {
-                val current = _uiState.value.checkpoints.toMutableList()
-                // Jangan izinkan menghapus index 0 (Start) atau index terakhir (Finish)
-                if (event.index > 0 && event.index < current.size - 1) {
-                    current.removeAt(event.index)
-                    _uiState.update { it.copy(checkpoints = current) }
+
+            is EventCreateEvent.RemoveStage -> {
+                val current = _uiState.value.stages.toMutableList()
+                if (current.size > 1) { // Minimal harus ada 1 SS
+                    current.removeAt(event.stageIndex)
+                    _uiState.update { it.copy(stages = current) }
                 }
             }
-            is EventCreateEvent.UpdateCheckpoint -> {
-                val current = _uiState.value.checkpoints.toMutableList()
-                current[event.index] = event.newName
-                _uiState.update { it.copy(checkpoints = current) }
+
+            is EventCreateEvent.AddCheckpointToStage -> {
+                val currentStages = _uiState.value.stages.toMutableList()
+                val targetStage = currentStages[event.stageIndex]
+                val cps = targetStage.checkpoints.toMutableList()
+
+                // Sisipkan tepat sebelum Garis Finish di stage tersebut
+                val insertIndex = if (cps.size > 1) cps.size - 1 else cps.size
+                cps.add(insertIndex, "Pos Tengah")
+
+                currentStages[event.stageIndex] = targetStage.copy(checkpoints = cps)
+                _uiState.update { it.copy(stages = currentStages) }
+            }
+
+            is EventCreateEvent.RemoveCheckpointFromStage -> {
+                val currentStages = _uiState.value.stages.toMutableList()
+                val targetStage = currentStages[event.stageIndex]
+                val cps = targetStage.checkpoints.toMutableList()
+
+                // Cegah penghapusan Start (0) dan Finish (terakhir)
+                if (event.cpIndex > 0 && event.cpIndex < cps.size - 1) {
+                    cps.removeAt(event.cpIndex)
+                    currentStages[event.stageIndex] = targetStage.copy(checkpoints = cps)
+                    _uiState.update { it.copy(stages = currentStages) }
+                }
+            }
+
+            is EventCreateEvent.UpdateCheckpointName -> {
+                val currentStages = _uiState.value.stages.toMutableList()
+                val targetStage = currentStages[event.stageIndex]
+                val cps = targetStage.checkpoints.toMutableList()
+
+                cps[event.cpIndex] = event.newName
+                currentStages[event.stageIndex] = targetStage.copy(checkpoints = cps)
+                _uiState.update { it.copy(stages = currentStages) }
             }
 
             EventCreateEvent.ClearError -> _uiState.update { it.copy(errorMessage = null) }
@@ -80,19 +117,27 @@ class EventCreateScreenModel(
         screenModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            // 1. Merakit Checkpoints Dinamis
-            val mappedCheckpoints = state.checkpoints.mapIndexed { index, checkpointName ->
-                val flag = when (index) {
-                    0 -> "START" // Elemen paling pertama selalu Start
-                    state.checkpoints.size - 1 -> "FINISH" // Elemen paling akhir selalu Finish
-                    else -> "MIDDLE" // Sisanya di tengah
-                }
+            // 1. Merakit Checkpoints Enduro (SANGAT PENTING!)
+            var globalSequenceOrder = 1 // Urutan tidak pernah reset agar peladen tahu rute total
+            val mappedCheckpoints = mutableListOf<CheckpointDetail>()
 
-                CheckpointDetail(
-                    checkpointName = checkpointName,
-                    typeFlag = flag,
-                    sequenceOrder = index + 1 // Urutan 1, 2, 3...
-                )
+            state.stages.forEach { stage ->
+                stage.checkpoints.forEachIndexed { index, checkpointName ->
+                    val flag = when (index) {
+                        0 -> "START"
+                        stage.checkpoints.size - 1 -> "FINISH"
+                        else -> "MIDDLE"
+                    }
+
+                    mappedCheckpoints.add(
+                        CheckpointDetail(
+                            checkpointName = checkpointName,
+                            typeFlag = flag,
+                            sequenceOrder = globalSequenceOrder++, // Naik terus lintas SS
+                            stageNumber = stage.stageNumber
+                        )
+                    )
+                }
             }
 
             // 2. Siapkan Request Body untuk Golang
@@ -100,7 +145,8 @@ class EventCreateScreenModel(
                 title = state.name,
                 startDatetime = state.date,
                 descriptionText = state.description,
-                data = ArrayList(mappedCheckpoints) // Masukkan array checkpoint yang sudah dirakit
+                categories = state.categories, // Array kategori baru
+                checkpoints = mappedCheckpoints // Array pos yang sudah mapan
             )
 
             // 3. Tembak ke Repository

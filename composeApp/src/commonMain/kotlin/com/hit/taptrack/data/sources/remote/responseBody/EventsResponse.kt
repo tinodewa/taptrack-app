@@ -44,18 +44,8 @@ data class EventDetail(
     var status: String? = null,
     @SerialName("description_text")
     var descriptionText: String? = null,
+    @SerialName("categories")
+    var categories: List<CategoryDetail> = emptyList(),
     @SerialName("checkpoints")
-    var checkpoints: ArrayList<Checkpoints> = arrayListOf()
-)
-
-@Serializable
-data class Checkpoints(
-    @SerialName("id")
-    var id: String? = null,
-    @SerialName("checkpoint_name")
-    var checkpointName: String? = null,
-    @SerialName("type_flag")
-    var typeFlag: String? = null,
-    @SerialName("sequence_order")
-    var sequenceOrder: Int? = null
+    var checkpoints: List<CheckpointDetail> = emptyList()
 )

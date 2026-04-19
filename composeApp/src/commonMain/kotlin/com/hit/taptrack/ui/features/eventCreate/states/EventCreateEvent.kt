@@ -13,9 +13,12 @@ sealed class EventCreateEvent {
     data class AddCategory(val category: String) : EventCreateEvent()
     data class RemoveCategory(val index: Int) : EventCreateEvent()
 
-    data class AddCheckpoint(val name: String) : EventCreateEvent()
-    data class RemoveCheckpoint(val index: Int) : EventCreateEvent()
-    data class UpdateCheckpoint(val index: Int, val newName: String) : EventCreateEvent()
+    // --- FITUR BARU: MANAJEMEN SPECIAL STAGE (SS) ---
+    object AddStage : EventCreateEvent()
+    data class RemoveStage(val stageIndex: Int) : EventCreateEvent()
+    data class AddCheckpointToStage(val stageIndex: Int) : EventCreateEvent()
+    data class RemoveCheckpointFromStage(val stageIndex: Int, val cpIndex: Int) : EventCreateEvent()
+    data class UpdateCheckpointName(val stageIndex: Int, val cpIndex: Int, val newName: String) : EventCreateEvent()
 
     object SubmitEvent : EventCreateEvent()
     object ClearError : EventCreateEvent()

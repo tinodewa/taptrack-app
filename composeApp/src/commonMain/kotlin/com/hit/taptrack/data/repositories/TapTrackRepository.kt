@@ -1,11 +1,13 @@
 package com.hit.taptrack.data.repositories
 
 import com.hit.taptrack.common.state.ResultState
+import com.hit.taptrack.data.sources.local.dao.CategoryDao
 import com.hit.taptrack.data.sources.local.dao.CheckpointDao
 import com.hit.taptrack.data.sources.local.dao.EventDao
 import com.hit.taptrack.data.sources.local.dao.ParticipantDao
 import com.hit.taptrack.data.sources.local.dao.ScanLogDao
 import com.hit.taptrack.data.sources.local.dao.TicketDao
+import com.hit.taptrack.data.sources.local.entity.CategoryEntity
 import com.hit.taptrack.data.sources.local.entity.CheckpointEntity
 import com.hit.taptrack.data.sources.local.entity.EventEntity
 import com.hit.taptrack.data.sources.local.entity.ParticipantEntity
@@ -41,6 +43,7 @@ class TapTrackRepository(
     private val scanLogDao: ScanLogDao,
     private val participantDao: ParticipantDao,
     private val checkpointDao: CheckpointDao,
+    private val categoryDao: CategoryDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
     // 1. UI akan mengobservasi Flow ini. Setiap ada perubahan di DB, UI otomatis update.
@@ -110,20 +113,39 @@ class TapTrackRepository(
                 is ResultState.Success -> {
                     val dto = result.data.data ?: return@withContext ResultState.Error(404, "Data kosong")
 
-                    // Simpan/Timpa ke Room SQLite
-                    val entity = EventEntity(
+                    // 1. Simpan Acara ke tabel `events`
+                    val eventEntity = EventEntity(
                         id = dto.id ?: "",
-                        title = dto.title ?: "Acara Tanpa Nama",
+                        title = dto.title ?: "",
                         startDatetime = dto.startDatetime ?: "",
                         status = dto.status ?: "UPCOMING",
                         descriptionText = dto.descriptionText ?: "",
                         checkpointCount = dto.checkpoints.size
                     )
+                    eventDao.upsertEvents(listOf(eventEntity))
 
-                    eventDao.upsertEvents(listOf(entity))
+                    // 2. Simpan Checkpoints ke tabel `checkpoints`
+                    val checkpointEntities = dto.checkpoints.map { cp ->
+                        CheckpointEntity(
+                            id = cp.id ?: "",
+                            eventId = dto.id ?: "",
+                            checkpointName = cp.checkpointName ?: "",
+                            typeFlag = cp.typeFlag ?: "MIDDLE",
+                            sequenceOrder = cp.sequenceOrder ?: 0,
+                            stageNumber = cp.stageNumber ?: 1
+                        )
+                    }
+                    checkpointDao.upsertCheckpoints(checkpointEntities)
 
-                    // Jika kamu juga ingin menyimpan Checkpoints ke lokal,
-                    // kamu bisa menyimpannya ke CheckpointDao di sini.
+                    // 3. Simpan Categories ke tabel `categories` (FITUR BARU)
+                    val categoryEntities = dto.categories.map { cat ->
+                        CategoryEntity(
+                            id = cat.id ?: "",
+                            eventId = dto.id ?: "",
+                            categoryName = cat.categoryName ?: "Umum"
+                        )
+                    }
+                    categoryDao.upsertCategories(categoryEntities)
 
                     ResultState.Success(Unit)
                 }
@@ -405,7 +427,8 @@ class TapTrackRepository(
                             eventId = eventId,
                             checkpointName = dto.checkpointName ?: "Unknown",
                             typeFlag = dto.typeFlag ?: "MIDDLE",
-                            sequenceOrder = dto.sequenceOrder ?: 0
+                            sequenceOrder = dto.sequenceOrder ?: 0,
+                            stageNumber = dto.stageNumber ?: 1
                         )
                     }
                     checkpointDao.upsertCheckpoints(entities)

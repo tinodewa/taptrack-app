@@ -7,8 +7,11 @@ data class EventCreateUiState(
     val description: String = "",
     val rules: String = "",
     val maxCapacity: String = "",
-    val categories: List<String> = listOf("FFA (Free For All)"), // Default 1 kelas
-    val checkpoints: List<String> = listOf("Garis Start", "Garis Finish"), // Wajib ada 2
+    val categories: List<String> = listOf("Hobby", "Pro"), // Sesuai JSON baru
+    // Default 1 Special Stage saat halaman dibuka
+    val stages: List<StageInputModel> = listOf(
+        StageInputModel(stageNumber = 1, checkpoints = listOf("SS1 Start", "SS1 Finish"))
+    ),
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val errorMessage: String? = null

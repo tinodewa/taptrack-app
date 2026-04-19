@@ -22,5 +22,15 @@ data class CheckpointDetail(
     @SerialName("type_flag")
     var typeFlag: String? = null,
     @SerialName("sequence_order")
-    var sequenceOrder: Int? = null
+    var sequenceOrder: Int? = null,
+    @SerialName("stage_number")
+    var stageNumber: Int? = null
+)
+
+@Serializable
+data class CategoryDetail(
+    @SerialName("id")
+    var id: String? = null,
+    @SerialName("category_name")
+    var categoryName: String? = null,
 )

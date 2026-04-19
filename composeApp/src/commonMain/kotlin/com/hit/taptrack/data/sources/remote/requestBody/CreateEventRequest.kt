@@ -1,5 +1,6 @@
 package com.hit.taptrack.data.sources.remote.requestBody
 
+import com.hit.taptrack.data.sources.remote.responseBody.CategoryDetail
 import com.hit.taptrack.data.sources.remote.responseBody.CheckpointDetail
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -12,8 +13,10 @@ data class CreateEventRequest(
     var startDatetime: String? = null,
     @SerialName("description_text")
     var descriptionText: String? = null,
+    @SerialName("categories")
+    var categories: List<String> = emptyList(),
     @SerialName("checkpoints")
-    var data: ArrayList<CheckpointDetail> = arrayListOf(),
+    var checkpoints: List<CheckpointDetail> = emptyList(),
 )
 
 @Serializable

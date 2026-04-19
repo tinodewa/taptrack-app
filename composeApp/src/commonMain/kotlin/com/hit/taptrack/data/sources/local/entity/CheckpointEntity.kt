@@ -9,5 +9,6 @@ data class CheckpointEntity(
     val eventId: String,
     val checkpointName: String,
     val typeFlag: String,
-    val sequenceOrder: Int
+    val sequenceOrder: Int,
+    val stageNumber: Int
 )

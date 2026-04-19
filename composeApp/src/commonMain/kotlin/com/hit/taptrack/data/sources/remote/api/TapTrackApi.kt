@@ -83,7 +83,7 @@ interface TapTrackApi {
     suspend fun getEventParticipantList(@Path("event_id") eventId: String): Response<EventParticipantListResponse>
 
     // Create Event
-    @POST("events")
+    @POST("events/")
     suspend fun createEvent(@Body request: CreateEventRequest): Response<CreateEventResponse>
 
     // Edit Event Status
