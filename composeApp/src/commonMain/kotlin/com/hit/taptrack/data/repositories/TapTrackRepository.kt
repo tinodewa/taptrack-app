@@ -156,11 +156,12 @@ class TapTrackRepository(
         }
     }
 
-    suspend fun joinEvent(eventId: String, raceNumber: String): ResultState<EventRegisterResponse> {
+    suspend fun joinEvent(eventId: String, raceNumber: String, categoryId: String): ResultState<EventRegisterResponse> {
         return withContext(ioDispatcher) {
             val request = EventRegistrationRequest(
                 eventId = eventId,
-                raceNumber = raceNumber
+                raceNumber = raceNumber,
+                categoryId = categoryId
             )
 
             handleApiCall(

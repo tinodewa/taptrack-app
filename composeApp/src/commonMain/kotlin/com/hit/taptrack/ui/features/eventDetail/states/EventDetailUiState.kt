@@ -12,6 +12,7 @@ data class EventDetailUiState(
     // --- State Pendaftaran ---
     val showJoinDialog: Boolean = false,
     val raceNumberInput: String = "",
+    val selectedCategoryId: String? = null,
     val isJoinLoading: Boolean = false,
     val isJoinSuccess: Boolean = false,
     val joinSuccessMessage: String? = null,

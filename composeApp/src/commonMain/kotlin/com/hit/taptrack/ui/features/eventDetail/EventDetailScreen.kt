@@ -1,8 +1,11 @@
 package com.hit.taptrack.ui.features.eventDetail
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,12 +38,19 @@ import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 // Kita tambahkan parameter eventId di class Screen
 data class EventDetailScreen(val eventId: String) : Screen {
     @Composable
     override fun Content() {
+
         val navigator = LocalNavigator.currentOrThrow
         val snackbarHostState = remember { SnackbarHostState() }
 
@@ -56,6 +66,7 @@ data class EventDetailScreen(val eventId: String) : Screen {
             }
         }
 
+        @OptIn(ExperimentalMaterial3Api::class)
         RmsScaffold(
             backgroundColor = MaterialTheme.colorScheme.background,
             snackbarHostState = snackbarHostState
@@ -127,36 +138,72 @@ data class EventDetailScreen(val eventId: String) : Screen {
                 }
             }
 
-            // Pop-up Dialog Input Nomor Lambung
+            // Pop-up Dialog Input Nomor Lambung & Kategori
             if (uiState.showJoinDialog) {
+                // Ambil daftar kategori dari state
+                val availableCategories = uiState.eventDetail?.categories ?: emptyList()
+                var expanded by remember { mutableStateOf(false) }
+
+                // Cari nama kategori yang sedang dipilih untuk ditampilkan di TextField
+                val selectedCategoryName = availableCategories.find { it.id == uiState.selectedCategoryId }?.name ?: "Pilih Kelas Balapan..."
+
                 AlertDialog(
                     onDismissRequest = { screenModel.onEvent(EventDetailEvent.HideJoinDialog) },
-                    title = { Text("Pilih Nomor Lambung") },
+                    title = { Text("Pendaftaran Balapan") },
                     text = {
-                        OutlinedTextField(
-                            value = uiState.raceNumberInput,
-                            onValueChange = {
-                                screenModel.onEvent(
-                                    EventDetailEvent.RaceNumberChanged(
-                                        it
-                                    )
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                            // 1. Input Nomor Lambung
+                            OutlinedTextField(
+                                value = uiState.raceNumberInput,
+                                onValueChange = { screenModel.onEvent(EventDetailEvent.RaceNumberChanged(it)) },
+                                label = { Text("Nomor Start (Cth: 99)") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            // 2. Dropdown Pilih Kategori
+                            ExposedDropdownMenuBox(
+                                expanded = expanded,
+                                onExpandedChange = { expanded = !expanded }
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedCategoryName,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Kelas") },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                    modifier = Modifier
+                                        .menuAnchor()
+                                        .fillMaxWidth(),
+                                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                                 )
-                            },
-                            label = { Text("Nomor Start (Cth: 99)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true
-                        )
+
+                                ExposedDropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    availableCategories.forEach { category ->
+                                        DropdownMenuItem(
+                                            text = { Text(category.name) },
+                                            onClick = {
+                                                screenModel.onEvent(EventDetailEvent.CategorySelected(category.id))
+                                                expanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     },
                     confirmButton = {
                         Button(
                             onClick = { screenModel.onEvent(EventDetailEvent.SubmitJoinEvent) },
-                            enabled = !uiState.isJoinLoading && uiState.raceNumberInput.isNotBlank()
+                            // Aktif hanya jika nomor terisi DAN kategori dipilih
+                            enabled = !uiState.isJoinLoading && uiState.raceNumberInput.isNotBlank() && uiState.selectedCategoryId != null
                         ) {
-                            if (uiState.isJoinLoading) CircularProgressIndicator(
-                                modifier = Modifier.size(
-                                    20.dp
-                                )
-                            )
+                            if (uiState.isJoinLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp))
                             else Text("KONFIRMASI")
                         }
                     },

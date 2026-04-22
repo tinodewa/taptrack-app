@@ -9,4 +9,6 @@ data class EventRegistrationRequest(
     var eventId: String? = null,
     @SerialName("race_number")
     var raceNumber: String? = null,
+    @SerialName("category_id")
+    var categoryId: String? = null
 )

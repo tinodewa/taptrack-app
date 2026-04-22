@@ -55,7 +55,7 @@ class EventManageScreenModel(
                         description = entity.descriptionText,
                         date = entity.startDatetime,
                         status = mapStringToStatus(entity.status),
-                        categories = listOf("Umum"), // Mock data for now
+                        categories = listOf(), // Mock data for now
                         stages = listOf() // Mock data for now
                     )
                     _uiState.update { it.copy(eventDetail = mappedDetail) }

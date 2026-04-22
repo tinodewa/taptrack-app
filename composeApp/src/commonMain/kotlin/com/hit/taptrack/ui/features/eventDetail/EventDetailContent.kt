@@ -146,17 +146,16 @@ fun EventDetailCompact(
                 Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                @OptIn(ExperimentalLayoutApi::class)
                 (FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    detail.categories.forEach { categoryName ->
+                    detail.categories.forEach { category ->
                         // Gunakan SuggestionChip atau Box custom untuk kategori
                         SuggestionChip(
                             onClick = { },
-                            label = { Text(categoryName, fontWeight = FontWeight.Bold) },
+                            label = { Text(category.name, fontWeight = FontWeight.Bold) },
                             colors = SuggestionChipDefaults.suggestionChipColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 labelColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -175,13 +174,21 @@ fun EventDetailCompact(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (detail.stages.isEmpty()) {
-                    Text("Belum ada rute yang ditentukan.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                    Text(
+                        "Belum ada rute yang ditentukan.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         detail.stages.forEach { stage ->
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                        alpha = 0.5f
+                                    )
+                                ),
                                 elevation = CardDefaults.cardElevation(0.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
@@ -335,17 +342,16 @@ fun EventDetailExpanded(
                 Text(text = "Kelas Tersedia", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                @OptIn(ExperimentalLayoutApi::class)
                 (FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    detail.categories.forEach { categoryName ->
+                    detail.categories.forEach { category ->
                         // Gunakan SuggestionChip atau Box custom untuk kategori
                         SuggestionChip(
                             onClick = { },
-                            label = { Text(categoryName, fontWeight = FontWeight.Bold) },
+                            label = { Text(category.name, fontWeight = FontWeight.Bold) },
                             colors = SuggestionChipDefaults.suggestionChipColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 labelColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -364,13 +370,21 @@ fun EventDetailExpanded(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (detail.stages.isEmpty()) {
-                    Text("Belum ada rute yang ditentukan.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                    Text(
+                        "Belum ada rute yang ditentukan.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         detail.stages.forEach { stage ->
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                        alpha = 0.5f
+                                    )
+                                ),
                                 elevation = CardDefaults.cardElevation(0.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {

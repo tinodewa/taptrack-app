@@ -9,6 +9,6 @@ data class EventDetailModel(
     val description: String,
     val date: String,
     val status: EventStatus,
-    val categories: List<String>, // Menampung nama kategori
+    val categories: List<CategoryUiModel>, // Menampung nama kategori
     val stages: List<StageUiModel> // Menampung rute per SS
 )

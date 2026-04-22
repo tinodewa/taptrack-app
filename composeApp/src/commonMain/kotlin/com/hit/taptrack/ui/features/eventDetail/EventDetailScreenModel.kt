@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.hit.taptrack.common.state.EventStatus
 import com.hit.taptrack.common.state.ResultState
 import com.hit.taptrack.common.state.UserRole
+import com.hit.taptrack.data.model.CategoryUiModel
 import com.hit.taptrack.data.model.EventDetailModel
 import com.hit.taptrack.data.model.StageUiModel
 import com.hit.taptrack.data.repositories.TapTrackRepository
@@ -49,12 +50,14 @@ class EventDetailScreenModel(
             EventDetailEvent.ShowJoinDialog -> _uiState.update {
                 it.copy(
                     showJoinDialog = true,
-                    raceNumberInput = ""
+                    raceNumberInput = "",
+                    selectedCategoryId = null
                 )
             }
 
             EventDetailEvent.HideJoinDialog -> _uiState.update { it.copy(showJoinDialog = false) }
             is EventDetailEvent.RaceNumberChanged -> _uiState.update { it.copy(raceNumberInput = event.number) }
+            is EventDetailEvent.CategorySelected -> _uiState.update { it.copy(selectedCategoryId = event.categoryId) }
             EventDetailEvent.SubmitJoinEvent -> processJoinEvent()
             EventDetailEvent.ClearError -> _uiState.update { it.copy(errorMessage = null) }
             EventDetailEvent.ManageEvent -> {
@@ -76,7 +79,7 @@ class EventDetailScreenModel(
                 if (eventEntity == null) return@combine null
 
                 // 1. Petakan Categories
-                val mappedCategories = categoryEntities.map { it.categoryName }
+                val mappedCategories = categoryEntities.map { CategoryUiModel(it.id, it.categoryName) }
 
                 // 2. Petakan Checkpoints menjadi Stages (Format Enduro)
                 val groupedStages = checkpointEntities
@@ -147,10 +150,20 @@ class EventDetailScreenModel(
             return
         }
 
+        if (state.selectedCategoryId.isNullOrBlank()) {
+            _uiState.update { it.copy(errorMessage = "Silakan pilih kelas balapan.") }
+            return
+        }
+
         _uiState.update { it.copy(isJoinLoading = true, errorMessage = null) }
 
         screenModelScope.launch {
-            val result = tapTrackRepository.joinEvent(eventId, state.raceNumberInput)
+            // Tembak Repository dengan parameter lengkap
+            val result = tapTrackRepository.joinEvent(
+                eventId = eventId,
+                raceNumber = state.raceNumberInput,
+                categoryId = state.selectedCategoryId
+            )
 
             when (result) {
                 is ResultState.Success -> {

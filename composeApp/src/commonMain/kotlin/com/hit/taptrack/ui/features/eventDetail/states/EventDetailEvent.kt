@@ -9,5 +9,6 @@ sealed class EventDetailEvent {
     object ShowJoinDialog : EventDetailEvent()
     object HideJoinDialog : EventDetailEvent()
     data class RaceNumberChanged(val number: String) : EventDetailEvent()
+    data class CategorySelected(val categoryId: String) : EventDetailEvent()
     object SubmitJoinEvent : EventDetailEvent()
 }
