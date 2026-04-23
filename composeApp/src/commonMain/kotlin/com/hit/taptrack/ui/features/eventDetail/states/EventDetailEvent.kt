@@ -11,4 +11,8 @@ sealed class EventDetailEvent {
     data class RaceNumberChanged(val number: String) : EventDetailEvent()
     data class CategorySelected(val categoryId: String) : EventDetailEvent()
     object SubmitJoinEvent : EventDetailEvent()
+
+    // FITUR BARU: Lihat Tiket
+    object ShowTicketDialog : EventDetailEvent()
+    object HideTicketDialog : EventDetailEvent()
 }

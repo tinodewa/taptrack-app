@@ -15,6 +15,9 @@ interface TicketDao {
     @Query("SELECT * FROM tickets ORDER BY startDatetime ASC")
     fun getAllTickets(): Flow<List<TicketEntity>>
 
+    @Query("SELECT * FROM tickets WHERE eventId = :eventId LIMIT 1")
+    fun getTicketByEventIdFlow(eventId: String): Flow<TicketEntity?>
+
     // Fitur tambahan: Hapus semua tiket (sangat berguna saat user Logout!)
     @Query("DELETE FROM tickets")
     suspend fun clearAllTickets()

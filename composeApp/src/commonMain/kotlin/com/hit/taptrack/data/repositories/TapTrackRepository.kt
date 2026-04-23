@@ -32,6 +32,7 @@ import com.hit.taptrack.utils.helpers.handleApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -63,9 +64,12 @@ class TapTrackRepository(
     fun getEventDetailFlow(eventId: String): Flow<EventEntity?> =
         eventDao.getEventByIdFlow(eventId)
 
-
     fun getCategoriesFlow(eventId: String): Flow<List<CategoryEntity>> =
         categoryDao.getCategoriesByEventFlow(eventId)
+
+    fun getTicketByEventIdFlow(eventId: String): Flow<TicketEntity?> =
+        ticketDao.getTicketByEventIdFlow(eventId)
+
 
     // 2. Fungsi untuk sinkronisasi data dari API ke Local DB
     suspend fun syncEvents(): ResultState<Unit> {
@@ -164,10 +168,34 @@ class TapTrackRepository(
                 categoryId = categoryId
             )
 
-            handleApiCall(
+            val result = handleApiCall(
                 apiCall = { tapTrackApi.joinEvent(request) },
                 tag = "Repo_JoinEvent"
             )
+
+            // 2. Jika sukses, simpan tiket ke Room Database Lokal
+            if (result is ResultState.Success) {
+                val responseData = result.data
+
+                // Ambil data acara (Judul & Tanggal) dari database lokal menggunakan .firstOrNull()
+                val localEvent = eventDao.getEventByIdFlow(eventId).firstOrNull()
+
+                // Rakit entitas tiket
+                val ticketEntity = TicketEntity(
+                    eventId = eventId,
+                    title = localEvent?.title ?: "Acara Tanpa Nama", // Fallback jika DB lokal kosong
+                    startDatetime = localEvent?.startDatetime ?: "",
+                    raceNumber = responseData.raceNumber ?: raceNumber,
+                    registrationStatus = "REGISTERED", // Status awal saat sukses mendaftar
+                    qrTokenHash = responseData.qrTokenHash ?: "",
+                )
+
+                // Simpan ke SQLite
+                ticketDao.upsertTickets(listOf(ticketEntity))
+            }
+
+            // 3. Kembalikan result ke ScreenModel
+            result
         }
     }
 
@@ -181,7 +209,7 @@ class TapTrackRepository(
 
             when (result) {
                 is ResultState.Success -> {
-                    val dtoList = result.data.data ?: emptyList()
+                    val dtoList = result.data.data
 
                     // Map dari API DTO ke SQLite Entity
                     val entities = dtoList.map { dto ->

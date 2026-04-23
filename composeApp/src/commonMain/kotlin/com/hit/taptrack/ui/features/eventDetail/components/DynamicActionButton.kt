@@ -23,7 +23,6 @@ import com.hit.taptrack.ui.features.eventDetail.states.EventDetailUiState
 fun DynamicActionButton(
     uiState: EventDetailUiState,
     onEvent: (EventDetailEvent) -> Unit,
-    onNavigateToTickets: () -> Unit,
     onNavigateToManageEvent: () -> Unit
 ) {
     val isUpcoming = uiState.eventDetail?.status == EventStatus.UPCOMING
@@ -33,12 +32,12 @@ fun DynamicActionButton(
             Button(
                 // Logika Klik: Jika sudah sukses daftar, pergi ke tiket. Jika belum, lakukan JoinEvent.
                 onClick = {
-                    if (uiState.isJoinSuccess) onNavigateToTickets()
+                    if (uiState.isJoinSuccess || uiState.isRegistered) onEvent(EventDetailEvent.ShowTicketDialog)
                     else onEvent(EventDetailEvent.ShowJoinDialog)
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 // Tombol aktif jika loading selesai, event upcoming, ATAU jika sudah sukses daftar
-                enabled = !uiState.isJoinLoading && (isUpcoming || uiState.isJoinSuccess),
+                enabled = !uiState.isJoinLoading && (isUpcoming || uiState.isJoinSuccess || uiState.isRegistered),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
@@ -51,7 +50,7 @@ fun DynamicActionButton(
                 } else {
                     Text(
                         // Ubah teks secara dinamis
-                        text = if (uiState.isJoinSuccess) "LIHAT TIKET"
+                        text = if (uiState.isJoinSuccess || uiState.isRegistered) "LIHAT TIKET"
                         else if (isUpcoming) "GABUNG BALAPAN"
                         else "PENDAFTARAN DITUTUP",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)

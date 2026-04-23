@@ -242,7 +242,7 @@ fun EventDetailCompact(
             shadowElevation = 8.dp
         ) {
             Box(modifier = Modifier.padding(16.dp)) {
-                DynamicActionButton(uiState, onEvent, onNavigateToTickets, onNavigateToManageEvent)
+                DynamicActionButton(uiState, onEvent, onNavigateToManageEvent)
             }
         }
     }
@@ -429,7 +429,7 @@ fun EventDetailExpanded(
 
                 Spacer(modifier = Modifier.weight(1f)) // Dorong tombol ke paling bawah
 
-                DynamicActionButton(uiState, onEvent, onNavigateToTickets, onNavigateToManageEvent)
+                DynamicActionButton(uiState, onEvent, onNavigateToManageEvent)
             }
         }
     }

@@ -1,11 +1,14 @@
 package com.hit.taptrack.ui.features.eventDetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,14 +40,25 @@ import com.hit.taptrack.ui.features.myTicket.MyTicketsScreen
 import com.hit.taptrack.ui.shared.RmsScaffold
 import org.koin.core.parameter.parametersOf
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Dialog
+import com.hit.taptrack.ui.features.myTicket.components.QrCodeDialog
+import com.hit.taptrack.ui.features.myTicket.states.MyTicketsEvent
 
 // Kita tambahkan parameter eventId di class Screen
 data class EventDetailScreen(val eventId: String) : Screen {
@@ -145,7 +159,9 @@ data class EventDetailScreen(val eventId: String) : Screen {
                 var expanded by remember { mutableStateOf(false) }
 
                 // Cari nama kategori yang sedang dipilih untuk ditampilkan di TextField
-                val selectedCategoryName = availableCategories.find { it.id == uiState.selectedCategoryId }?.name ?: "Pilih Kelas Balapan..."
+                val selectedCategoryName =
+                    availableCategories.find { it.id == uiState.selectedCategoryId }?.name
+                        ?: "Pilih Kelas Balapan..."
 
                 AlertDialog(
                     onDismissRequest = { screenModel.onEvent(EventDetailEvent.HideJoinDialog) },
@@ -156,7 +172,13 @@ data class EventDetailScreen(val eventId: String) : Screen {
                             // 1. Input Nomor Lambung
                             OutlinedTextField(
                                 value = uiState.raceNumberInput,
-                                onValueChange = { screenModel.onEvent(EventDetailEvent.RaceNumberChanged(it)) },
+                                onValueChange = {
+                                    screenModel.onEvent(
+                                        EventDetailEvent.RaceNumberChanged(
+                                            it
+                                        )
+                                    )
+                                },
                                 label = { Text("Nomor Start (Cth: 99)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
@@ -173,7 +195,11 @@ data class EventDetailScreen(val eventId: String) : Screen {
                                     onValueChange = {},
                                     readOnly = true,
                                     label = { Text("Kelas") },
-                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(
+                                            expanded = expanded
+                                        )
+                                    },
                                     modifier = Modifier
                                         .menuAnchor()
                                         .fillMaxWidth(),
@@ -188,7 +214,11 @@ data class EventDetailScreen(val eventId: String) : Screen {
                                         DropdownMenuItem(
                                             text = { Text(category.name) },
                                             onClick = {
-                                                screenModel.onEvent(EventDetailEvent.CategorySelected(category.id))
+                                                screenModel.onEvent(
+                                                    EventDetailEvent.CategorySelected(
+                                                        category.id
+                                                    )
+                                                )
                                                 expanded = false
                                             }
                                         )
@@ -203,7 +233,11 @@ data class EventDetailScreen(val eventId: String) : Screen {
                             // Aktif hanya jika nomor terisi DAN kategori dipilih
                             enabled = !uiState.isJoinLoading && uiState.raceNumberInput.isNotBlank() && uiState.selectedCategoryId != null
                         ) {
-                            if (uiState.isJoinLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                            if (uiState.isJoinLoading) CircularProgressIndicator(
+                                modifier = Modifier.size(
+                                    20.dp
+                                )
+                            )
                             else Text("KONFIRMASI")
                         }
                     },
@@ -216,6 +250,85 @@ data class EventDetailScreen(val eventId: String) : Screen {
                         }
                     }
                 )
+            }
+
+            // Pop-up Dialog Tiket (Jika sudah terdaftar dan tombol diklik)
+            if (uiState.showTicketDialog && uiState.ticketData != null) {
+                QrCodeDialog(
+                    ticket = uiState.ticketData!!,
+                    onDismiss = { screenModel.onEvent(EventDetailEvent.HideTicketDialog) }
+                )
+//                Dialog(onDismissRequest = { screenModel.onEvent(EventDetailEvent.HideTicketDialog) }) {
+//                    Card(
+//                        shape = RoundedCornerShape(24.dp),
+//                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+//                        elevation = CardDefaults.cardElevation(8.dp)
+//                    ) {
+//                        Column(
+//                            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+//                            horizontalAlignment = Alignment.CenterHorizontally
+//                        ) {
+//                            Text(
+//                                text = "TIKET BALAPAN",
+//                                style = MaterialTheme.typography.titleLarge,
+//                                fontWeight = FontWeight.Black,
+//                                color = MaterialTheme.colorScheme.primary
+//                            )
+//                            Spacer(modifier = Modifier.height(8.dp))
+//                            Text(
+//                                text = uiState.eventDetail?.name ?: "Event",
+//                                style = MaterialTheme.typography.bodyMedium,
+//                                color = Color.Gray
+//                            )
+//
+//                            Spacer(modifier = Modifier.height(24.dp))
+//
+//                            // Placeholder QR Code (Bisa diganti dengan bitmap ZXing)
+//                            Box(
+//                                modifier = Modifier
+//                                    .size(200.dp)
+//                                    .background(Color.White, RoundedCornerShape(12.dp))
+//                                    .padding(16.dp),
+//                                contentAlignment = Alignment.Center
+//                            ) {
+//                                // Ganti dengan Image bitmap jika menggunakan Zxing
+//                                Icon(
+//                                    Icons.Default.QrCode2,
+//                                    contentDescription = "QR Code",
+//                                    modifier = Modifier.fillMaxSize(),
+//                                    tint = Color.Black
+//                                )
+//                            }
+//
+//                            Spacer(modifier = Modifier.height(24.dp))
+//
+//                            // Nomor Lambung User
+//                            Box(
+//                                modifier = Modifier
+//                                    .background(
+//                                        MaterialTheme.colorScheme.secondaryContainer,
+//                                        RoundedCornerShape(8.dp)
+//                                    )
+//                                    .padding(horizontal = 24.dp, vertical = 8.dp)
+//                            ) {
+//                                Text(
+//                                    text = "#${uiState.ticketData!!.raceNumber}",
+//                                    style = MaterialTheme.typography.displaySmall,
+//                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+//                                    fontWeight = FontWeight.Black
+//                                )
+//                            }
+//
+//                            Spacer(modifier = Modifier.height(24.dp))
+//                            Button(
+//                                onClick = { screenModel.onEvent(EventDetailEvent.HideTicketDialog) },
+//                                modifier = Modifier.fillMaxWidth()
+//                            ) {
+//                                Text("TUTUP")
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }

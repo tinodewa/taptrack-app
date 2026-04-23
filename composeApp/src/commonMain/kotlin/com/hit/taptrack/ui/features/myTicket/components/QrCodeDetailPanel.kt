@@ -61,11 +61,11 @@ fun QrCodeDetailPanel(ticket: TicketModel, isDialog: Boolean = false) {
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
-        Text(text = "Kelas: ${ticket.category}", style = MaterialTheme.typography.bodyLarge)
-        Text(
-            text = "ID: ${ticket.registrationId}",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
+//        Text(text = "Kelas: ${ticket.category}", style = MaterialTheme.typography.bodyLarge)
+//        Text(
+//            text = "ID: ${ticket.registrationId}",
+//            style = MaterialTheme.typography.labelMedium,
+//            color = MaterialTheme.colorScheme.primary
+//        )
     }
 }

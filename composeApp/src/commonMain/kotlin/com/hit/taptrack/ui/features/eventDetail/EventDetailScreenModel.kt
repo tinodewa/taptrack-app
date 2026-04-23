@@ -8,6 +8,7 @@ import com.hit.taptrack.common.state.UserRole
 import com.hit.taptrack.data.model.CategoryUiModel
 import com.hit.taptrack.data.model.EventDetailModel
 import com.hit.taptrack.data.model.StageUiModel
+import com.hit.taptrack.data.model.TicketModel
 import com.hit.taptrack.data.repositories.TapTrackRepository
 import com.hit.taptrack.ui.features.eventDetail.states.EventDetailEvent
 import com.hit.taptrack.ui.features.eventDetail.states.EventDetailUiState
@@ -41,7 +42,7 @@ class EventDetailScreenModel(
         // Mulai pemantauan lokal dan sinkronisasi jaringan
         observeEventDetail()
         syncEventDetailFromApi()
-
+        observeLocalTicket() // FITUR BARU: Pantau tiket lokal!
     }
 
     fun onEvent(event: EventDetailEvent) {
@@ -62,6 +63,36 @@ class EventDetailScreenModel(
             EventDetailEvent.ClearError -> _uiState.update { it.copy(errorMessage = null) }
             EventDetailEvent.ManageEvent -> {
                 // TODO: Navigasi/Trigger ke fitur Kelola Acara (Committee Only)
+            }
+            EventDetailEvent.ShowTicketDialog -> _uiState.update { it.copy(showTicketDialog = true) }
+            EventDetailEvent.HideTicketDialog -> _uiState.update { it.copy(showTicketDialog = false) }
+        }
+    }
+
+    private fun observeLocalTicket() {
+        screenModelScope.launch {
+            // ASUMSI: Kamu memiliki fungsi di repository untuk membaca tiket berdasarkan eventId.
+            // Flow ini akan otomatis ter-update jika processJoinEvent berhasil menyimpan tiket ke Room DB.
+            tapTrackRepository.getTicketByEventIdFlow(eventId).collect { ticketEntity ->
+                if (ticketEntity != null) {
+                    _uiState.update {
+                        it.copy(
+                            isRegistered = true, // Ubah status menjadi terdaftar
+                            ticketData = TicketModel(
+                                registrationId = ticketEntity.eventId,
+                                eventName = ticketEntity.title,
+                                date = ticketEntity.startDatetime,
+                                location = "Sirkuit Utama", // Fallback UI
+                                category = "Kelas Umum", // Fallback UI
+                                racerNumber = ticketEntity.raceNumber,
+                                qrCodePayload = ticketEntity.qrTokenHash,
+                                status = ticketEntity.registrationStatus
+                            )
+                        )
+                    }
+                } else {
+                    _uiState.update { it.copy(isRegistered = false, ticketData = null) }
+                }
             }
         }
     }
