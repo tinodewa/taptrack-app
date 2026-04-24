@@ -1,0 +1,7 @@
+./com/hit/taptrack/MainActivity.kt
+./com/hit/taptrack/data/sources/local/AppDatabase.android.kt
+./com/hit/taptrack/di/Koin.android.kt
+./com/hit/taptrack/platform/AndroidNetworkMonitor.kt
+./com/hit/taptrack/ui/TaptrackApplication.kt
+./com/hit/taptrack/ui/features/scan/components/QRScannerView.android.kt
+./com/hit/taptrack/ui/features/scan/components/RequireCameraPermission.android.kt

@@ -1,0 +1,6 @@
+./com/hit/taptrack/data/sources/local/AppDatabase.jvm.kt
+./com/hit/taptrack/di/Koin.jvm.kt
+./com/hit/taptrack/main.kt
+./com/hit/taptrack/platform/DesktopNetworkMonitor.kt
+./com/hit/taptrack/ui/features/scan/components/QRScannerView.jvm.kt
+./com/hit/taptrack/ui/features/scan/components/RequireCameraPermission.jvm.kt

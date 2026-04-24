@@ -44,7 +44,7 @@ plugins {
 
 kotlin {
     // Tambahkan baris ini agar SEMUA target (Android & Desktop) pakai Java 17
-    jvmToolchain(17)
+    jvmToolchain(21)
 
     androidTarget {
         compilerOptions {

@@ -1,0 +1,39 @@
+Reusing configuration cache.
+> Task :composeApp:generateJvmMainNonAndroidBuildConfig SKIPPED
+> Task :composeApp:generateNonAndroidBuildConfig SKIPPED
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+> Task :composeApp:generateComposeResClass UP-TO-DATE
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:copyNonXmlValueResourcesForJvmMain NO-SOURCE
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForJvmMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain UP-TO-DATE
+> Task :composeApp:prepareComposeResourcesTaskForJvmMain NO-SOURCE
+> Task :composeApp:convertXmlValueResourcesForCommonMain NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForJvmMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain UP-TO-DATE
+> Task :composeApp:generateResourceAccessorsForCommonMain UP-TO-DATE
+> Task :composeApp:generateActualResourceCollectorsForJvmMain UP-TO-DATE
+> Task :composeApp:transformCommonMainDependenciesMetadata UP-TO-DATE
+> Task :composeApp:kspCommonMainKotlinMetadata UP-TO-DATE
+> Task :composeApp:kspKotlinJvm UP-TO-DATE
+
+> Task :composeApp:compileKotlinJvm FAILED
+e: file:///Users/tinoanggara/works/taptrack/taptrackKMP/composeApp/src/commonMain/kotlin/com/hit/taptrack/ui/features/eventCreate/components/BasicInfoSection.kt:148:9 This material API is experimental and is likely to change or to be removed in the future.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':composeApp:compileKotlinJvm'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 5s
+11 actionable tasks: 2 executed, 9 up-to-date
+Configuration cache entry reused.
